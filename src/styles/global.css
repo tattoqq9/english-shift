@@ -3586,7 +3586,7 @@ button.more-card { cursor: pointer; }
   .build-day-group > summary small { white-space: normal; }
 }
 
-/* v0.4.5 Level 2 quality / feedback */
+/* v0.4.6 Level 2 quality / feedback */
 .build-hint-stack { display: grid; gap: 8px; margin-top: 12px; }
 .build-hint-stack .build-hint-note { margin-top: 0; display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
 .build-hint-stack .build-hint-note strong { font-size: 10px; letter-spacing: .08em; color: #9a5b18; }

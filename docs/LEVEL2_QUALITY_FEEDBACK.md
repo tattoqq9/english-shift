@@ -1,8 +1,8 @@
-# Level 2 BUILD Quality & Feedback — v0.4.5
+# Level 2 BUILD Quality & Feedback — v0.4.6
 
 ## Goal
 
-Level 2 is no longer judged only by content count or grammar coverage. v0.4.5 treats BUILD as a production-learning loop:
+Level 2 is no longer judged only by content count or grammar coverage. v0.4.6 treats BUILD as a production-learning loop:
 
 `Build → Check → Diagnose → Revise → Optional Hint → Answer Review`
 
@@ -23,6 +23,14 @@ Each BUILD Activity has exactly three hints:
 3. **Partial-position hint** — reveals only the beginning/end anchor, not the full answer.
 
 `Show best answer` appears after three checks or all three hint stages.
+
+## Content repair pass
+
+v0.4.6 replaces equal-width word splitting with phrase-aware chunking. The generator now protects determiners, prepositions, auxiliaries, question frames, sentence boundaries and common multiword grammar frames. Activities that need especially clear teaching units use reviewed chunk overrides.
+
+Structure Slot labels are derived from the actual chunk instead of being assigned only by position. Labels now distinguish question frames, question details, auxiliaries, conditions, connectors, response openings, tag questions, actions and passive/state chunks.
+
+Distractors no longer fall back to generic time phrases. Short or structurally sensitive Activities use reviewed contextual distractors, while generated distractors must pass filters for incomplete fragments, broken pronoun case, malformed modal combinations and other mechanical errors.
 
 ## BUILD Answer Review
 
@@ -45,8 +53,10 @@ The result screen now separates:
 - target response <= 30 words
 - at least two unique distractors
 - no distractor equal to a target chunk
-- low-quality malformed distractor patterns blocked
+- exactly two contextual distractors per Activity
+- generic fallback and low-quality malformed patterns blocked
+- target chunks do not cross sentence boundaries or end after a determiner
+- Structure Map labels use the reviewed label set and match Hint 2
 - wrong-order correct chunks => Almost
 - distractor use => Not quite
 - Japanese diagnostic feedback
-

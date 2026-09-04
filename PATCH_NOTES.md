@@ -1,58 +1,66 @@
-# English Shift v0.4.5 — Level 2 Quality & Feedback Pass
+# English Shift v0.4.6 — Level 2 Content Repair Pass
 
 ## What changed
 
-### 1. Correct / Almost / Not quite diagnosis
+### 1. Phrase-aware target chunks
 
-BUILD now compares target-chunk inclusion and sequence similarity rather than relying mainly on a correct-prefix rule.
+Level 2 target sentences are no longer divided mainly by equal word count. The splitter now avoids cutting after determiners and auxiliaries, respects sentence and clause boundaries, protects common question frames, and gives reviewed Activities explicit teaching chunks where needed.
 
-- Correct: exact target order
-- Almost: required chunks are present but reordered, or the sentence is structurally very close
-- Not quite: distractor use, missing meaning, or larger structural mismatch
+Examples:
 
-Feedback is Japanese and explains what kind of revision to make without revealing the answer.
+- `I’m calling / a staff member / to help you.`
+- `We’re going to / receive more / on Friday.`
+- `You paid / the room charge online, / didn’t you?`
 
-### 2. Three-stage optional hints
+Activity IDs and Level 2 progress keys are unchanged.
 
-Every Level 2 Activity now receives exactly three progressive hints:
+### 2. Structure Slots based on the actual chunk
 
-1. thinking / grammar concept
-2. sentence-role skeleton
-3. partial chunk-position anchor
+Slot labels are now derived from the text and grammar role of each chunk. The Structure Map distinguishes response openings, question frames, question details, auxiliaries, conditions, connectors, tag questions, actions, passive/state chunks and details.
 
-The full answer is never included in a hint. `Show best answer` is available after repeated checks or all three hints.
+This removes mappings such as `Yes, / you / can.` being described as a generic subject/action/object sequence.
 
-### 3. BUILD-specific Answer Review
+### 3. Contextual distractors
 
-Results now show:
+The generic `right now.` / `later today.` fallback has been removed. Short and structurally sensitive Activities use reviewed distractors. Generated distractors are rejected when they contain broken pronoun case, incomplete filler, malformed modal combinations, duplicate target chunks or other mechanical patterns.
 
-- YOUR LAST TRY when it differs from the model
-- BEST RESPONSE + Japanese
-- STRUCTURE MAP
-- WHY? grammar / construction points
-- Customer follow-up
+### 4. Stronger automated audit
 
-### 4. Distractor quality pass
+`npm run level2:quality` now checks:
 
-The previous fallback that could mechanically reverse words has been removed. Distractor generation now prioritizes plausible learner confusions such as auxiliary choice, agreement, demonstratives, time/preposition contrasts and other local contrasts; a neutral semantic distractor is used only when no useful local mutation exists.
+- 144 Activities
+- exactly three progressive hints per Activity
+- 144 Structure Maps using the reviewed label set
+- exactly 288 reviewed/generated distractors
+- no generic fallback distractors
+- no malformed distractor patterns covered by the audit
+- no target chunk crossing a sentence boundary
+- no target chunk ending after an article or possessive determiner
+- Correct / Almost / Not quite behavior for every Activity
+- Japanese diagnostic feedback
 
-### 5. Full Level 2 quality audit
+### 5. Build hygiene
 
-New command:
-
-```powershell
-npm run level2:quality
-```
-
-The audit checks all 144 Activities for progressive hints, sentence/chunk length, distractor uniqueness and malformed patterns, Japanese feedback, and Correct/Almost/Not quite behavior.
+`*.tsbuildinfo` is ignored so `npm run build` no longer leaves TypeScript build metadata as untracked files.
 
 ## Preserved
 
 - Level 1: 48 Shifts / 144 Activities
 - Level 2: 48 Days / 144 Activities
-- ES-G1/G2 Level 2 coverage: 70/70
+- Existing Level 2 progress and Activity IDs
+- ES-G1/G2 coverage: 70/70
 - Exam Shift ES-G3: 26/26
 - Mastery / Weakness Review
 - REPAIR LAB: 6 Units / 24 Missions
 - FLOW LAB: unchanged / on hold
-- Home / Learn / Mastery / More navigation
+
+## Verification
+
+```powershell
+npm run level2:quality
+npm run core:check
+npm run grammar:audit
+npm run advanced:check
+npm run nav:check
+npm run build
+```

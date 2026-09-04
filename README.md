@@ -1,6 +1,6 @@
-# English Shift v0.4.5
+# English Shift v0.4.6
 
-This version completes the first **Level 2 · BUILD quality and feedback pass**.
+This version completes the **Level 2 · BUILD content repair pass** after the first quality and feedback implementation.
 
 ## Learning architecture
 
@@ -15,8 +15,10 @@ This version completes the first **Level 2 · BUILD quality and feedback pass**.
 - 8 Chapters / 48 Days / **144 BUILD Activities**
 - ES-G1 + ES-G2 **70/70** through sentence construction
 - Standard / Guided / Challenge modes
+- phrase-aware chunks and contextual distractors
+- chunk-specific Structure Maps
 
-### v0.4.5 learning loop
+### v0.4.6 learning loop and content repair
 
 ```text
 Build your sentence

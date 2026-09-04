@@ -184,7 +184,7 @@ for (const row of noReview) md.push(`- \`${row.key}\``)
 md.push('')
 md.push('> Coverage means the concept has a deliberate target activity. Review density is reported separately and will become stricter before Level 2.')
 
-console.log('=== English Shift Grammar Audit v0.4.5 ===')
+console.log('=== English Shift Grammar Audit v0.4.6 ===')
 console.log(`Activities=${allActivities.length} Shifts=${allDays.length} Registry=${grammarRegistry.length}`)
 for (const tier of tiers) {
   const s = tierSummary[tier] as { total: number; expected: number; complete: number; partial: number; missing: number; touched: number }

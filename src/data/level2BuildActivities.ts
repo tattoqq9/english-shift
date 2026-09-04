@@ -277,7 +277,7 @@ function targetFromActivity(activity: Chapter1Activity) {
 
 function targetChunkCount(sentence: string) {
   const words = sentence.trim().split(/\s+/).filter(Boolean).length
-  if (words <= 4) return Math.min(3, words)
+  if (words <= 4) return /^(yes|no|certainly|great|understood)[,.!]?\s/i.test(sentence) ? 2 : Math.min(3, words)
   if (words <= 8) return 3
   if (words <= 13) return 4
   if (words <= 20) return 5
@@ -285,66 +285,220 @@ function targetChunkCount(sentence: string) {
 }
 
 const BOUNDARY_WORDS = new Set(['and', 'but', 'because', 'so', 'if', 'when', 'while', 'although', 'however', 'therefore', 'otherwise', 'before', 'after', 'unless', 'whether', 'that', 'who', 'which', 'where', 'since', 'then', 'rather'])
+const INCOMPLETE_TAIL_WORDS = new Set([
+  'a', 'an', 'the', 'this', 'that', 'these', 'those', 'my', 'your', 'our', 'their', 'his', 'her', 'its',
+  'to', 'of', 'for', 'with', 'without', 'from', 'at', 'in', 'on', 'by', 'about', 'toward', 'through',
+  'and', 'or', 'but', 'because', 'so', 'if', 'when', 'while', 'although', 'unless', 'whether', 'than',
+  'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'do', 'does', 'did', 'have', 'has', 'had',
+  'can', 'could', 'will', 'would', 'should', 'must', 'may', 'might', 'not', 'no',
+])
+const SINGLE_CHUNK_WORDS = new Set([
+  'yes', 'no', 'great', 'certainly', 'however', 'therefore', 'otherwise', 'then', 'and', 'but',
+  'is', 'are', 'was', 'were', 'do', 'does', 'did', 'can', 'could', 'will', 'would', 'should', 'must', 'may', 'might',
+])
 
-function splitIntoChunks(sentence: string) {
+const CHUNK_OVERRIDES: Record<string, string[]> = {
+  'build-d1-umbrella': ['Yes, we do.', 'They’re near', 'the entrance.'],
+  'build-d1-sale': ['No, this one isn’t.', 'That tea', 'is on sale', 'today.'],
+  'build-d2-restroom': ['It’s', 'next to the ATM,', 'near the entrance.'],
+  'build-d2-atm': ['Yes, there is.', 'It’s behind', 'the ticket machine.'],
+  'build-d4-child': ['Please wait here.', 'I’m calling', 'a staff member', 'to help you.'],
+  'build-d5-price-tag': ['I’m sorry.', 'Let me check', 'the price tag', 'for you.'],
+  'build-d5-receipt': ['Do you', 'have', 'the receipt?'],
+  'build-d8-shoes-fit': ['They feel', 'too tight around the toes.', 'Let’s try', 'a larger size.'],
+  'build-d10-stock-arrival': ['We’re going to', 'receive more', 'on Friday.'],
+  'build-d10-fitting-history': ['Were you trying on', 'size S', 'when you', 'noticed the damage?'],
+  'build-d12-style-rush': ['What a great find!', 'This one', 'is light,', 'easy to pack,', 'and within your budget.'],
+  'build-d15-hiking-advice': ['You should', 'bring', 'a light extra layer.'],
+  'build-d15-safety-rush': ['You should', 'bring', 'an extra pair of', 'warm socks.'],
+  'build-d16-if-weather': ['If it rains at night,', 'you’ll want', 'a waterproof', 'tent cover.'],
+  'build-d17-if-i-were-you': ['If I were you,', 'I’d choose', 'a sleeping bag', 'rated for colder temperatures.'],
+  'build-d19-damaged-opened': ['Is', 'an opened package', 'okay if', 'the product has not been used?'],
+  'build-d24-specialist-request': ['I’ll ask', 'our setup specialist', 'to explain', 'the data-transfer options.'],
+  'build-d25-lunch-set': ['Would you like', 'fries', 'or a salad', 'as your side?'],
+  'build-d29-another-drink': ['Of course.', 'I’ll bring you', 'another lemonade.'],
+  'build-d30-dinner-rush': ['Of course.', 'I’ll bring you', 'a few more', 'forks.'],
+  'build-d30-order-complaint': ['I’m sorry about that.', 'I’ll replace', 'the fries', 'with the salad you ordered', 'right away.'],
+  'build-d35-payment-confirm': ['You paid', 'the room charge online,', 'didn’t you?'],
+  'build-d38-giftwrap-incident': ['If the service tag', 'had stayed with the package,', 'the wrapping desk', 'would have known', 'that gift wrapping was required.'],
+  'build-d39-asif-complaint': ['It looks', 'as if the bag', 'had been used,', 'but let me check', 'the sales record first.'],
+  'build-d42-manager-handoff': ['The same fault returned', 'after our repair.', 'She has the receipt', 'and needs the headphones tonight.', 'Could we prioritize', 'a replacement?'],
+  'build-d44-vip-briefing': ['She has forty-five minutes,', 'needs a formal business gift,', 'and wants to avoid large visible logos.', 'Could you prioritize', 'options that meet those conditions', 'first?'],
+}
+
+function plainWord(word: string) {
+  return word.toLowerCase().replace(/^[“”'\"]+|[“”'\",.!?;:]+$/g, '')
+}
+
+function splitCost(words: string[], start: number, end: number, idealLength: number) {
+  const length = end - start
+  const first = plainWord(words[start])
+  const last = plainWord(words[end - 1])
+  const next = end < words.length ? plainWord(words[end]) : ''
+  let cost = Math.abs(length - idealLength) * 4
+
+  if (length > 8) cost += (length - 8) * 30
+  if (length === 1 && !SINGLE_CHUNK_WORDS.has(first) && !/[.!?;:]$/.test(words[start])) cost += 14
+  if (words.slice(start, end - 1).some((word) => /[.!?;][”']?$/.test(word))) cost += 120
+  if (INCOMPLETE_TAIL_WORDS.has(last)) cost += 80
+  if (/^(how):(much|many|long|cold|heavy)$/.test(`${last}:${next}`)) cost += 80
+  if (/^(what|which):(color|pattern|name|size|time)$/.test(`${last}:${next}`)) cost += 80
+  if (/[.!?;:]$/.test(words[end - 1])) cost -= 24
+  if (BOUNDARY_WORDS.has(next)) cost -= 12
+  if (start > 0 && BOUNDARY_WORDS.has(first)) cost -= 5
+  return cost
+}
+
+function splitIntoChunks(id: string, sentence: string) {
+  const override = CHUNK_OVERRIDES[id]
+  if (override) return override
   const words = sentence.trim().split(/\s+/).filter(Boolean)
   if (words.length <= 3) return words
   const desired = Math.min(targetChunkCount(sentence), words.length)
-  const boundaries: number[] = []
-  for (let part = 1; part < desired; part += 1) {
-    const ideal = Math.round((words.length * part) / desired)
-    let best = ideal; let bestScore = Number.POSITIVE_INFINITY
-    for (let candidate = Math.max(1, ideal - 3); candidate <= Math.min(words.length - 1, ideal + 3); candidate += 1) {
-      if (boundaries.includes(candidate)) continue
-      const previous = words[candidate - 1]
-      const next = words[candidate]?.toLowerCase().replace(/^[“'\"]|[,.!?;:]$/g, '')
-      let score = Math.abs(candidate - ideal) * 3
-      if (/[,.!?;:]$/.test(previous)) score -= 5
-      if (BOUNDARY_WORDS.has(next)) score -= 4
-      if (candidate > 0 && BOUNDARY_WORDS.has(words[candidate - 1].toLowerCase().replace(/[,.!?;:]$/g, ''))) score -= 2
-      if (score < bestScore) { best = candidate; bestScore = score }
+  const idealLength = words.length / desired
+  const dp = Array.from({ length: desired + 1 }, () => Array<number>(words.length + 1).fill(Number.POSITIVE_INFINITY))
+  const previous = Array.from({ length: desired + 1 }, () => Array<number>(words.length + 1).fill(-1))
+  dp[0][0] = 0
+
+  for (let part = 1; part <= desired; part += 1) {
+    for (let end = part; end <= words.length; end += 1) {
+      for (let start = part - 1; start < end; start += 1) {
+        if (!Number.isFinite(dp[part - 1][start])) continue
+        const remainingWords = words.length - end
+        const remainingParts = desired - part
+        if (remainingWords < remainingParts) continue
+        const candidate = dp[part - 1][start] + splitCost(words, start, end, idealLength)
+        if (candidate < dp[part][end]) { dp[part][end] = candidate; previous[part][end] = start }
+      }
     }
-    boundaries.push(best)
   }
-  const unique = [...new Set(boundaries)].sort((a, b) => a - b)
-  const chunks: string[] = []; let start = 0
-  for (const boundary of unique) { if (boundary > start) chunks.push(words.slice(start, boundary).join(' ')); start = boundary }
-  if (start < words.length) chunks.push(words.slice(start).join(' '))
-  return chunks.filter(Boolean)
+
+  const boundaries: number[] = [words.length]
+  let end = words.length
+  for (let part = desired; part > 0; part -= 1) {
+    end = previous[part][end]
+    if (end > 0) boundaries.push(end)
+  }
+  boundaries.push(0)
+  boundaries.sort((a, b) => a - b)
+  return boundaries.slice(0, -1).map((start, index) => words.slice(start, boundaries[index + 1]).join(' ')).filter(Boolean)
 }
 
-function mutateChunk(text: string, variant: 0 | 1) {
-  const replacements: Array<[RegExp, string]> = variant === 0
-    ? [[/\bdoes\b/i, 'do'], [/\bdo\b/i, 'does'], [/\bdid\b/i, 'do'], [/\bis\b/i, 'are'], [/\bare\b/i, 'is'], [/\bwas\b/i, 'were'], [/\bwere\b/i, 'was'], [/\bhas\b/i, 'have'], [/\bhave\b/i, 'has'], [/\bhad\b/i, 'have'], [/\bcould\b/i, 'can'], [/\bwould\b/i, 'will'], [/\bshould\b/i, 'must'], [/\bmust\b/i, 'should'], [/\bcan\b/i, 'could'], [/\bmay\b/i, 'might'], [/\bmight\b/i, 'may'], [/\bno longer\b/i, 'not anymore']]
-    : [[/\bhas\b/i, 'had'], [/\bhave\b/i, 'had'], [/\bhad\b/i, 'has'], [/\bis\b/i, 'does'], [/\bare\b/i, 'do'], [/\bwill\b/i, 'would'], [/\bwas\b/i, 'is'], [/\bwere\b/i, 'are'], [/\bthan\b/i, 'as'], [/\bas\b/i, 'than'], [/\bto\b/i, ''], [/\bbecause\b/i, 'so'], [/\bunless\b/i, 'if not']]
-  for (const [pattern, replacement] of replacements) if (pattern.test(text)) return text.replace(pattern, replacement).replace(/\s+/g, ' ').trim()
-  const phraseReplacements: Array<[RegExp, string]> = variant === 0
-    ? [[/\bthis\b/i, 'that'], [/\bthese\b/i, 'those'], [/\ba\b/i, 'the'], [/\ban\b/i, 'the'], [/\btoday\b/i, 'yesterday'], [/\bbefore\b/i, 'after'], [/\bafter\b/i, 'before'], [/\bfirst\b/i, 'later'], [/\bmore\b/i, 'less'], [/\blighter\b/i, 'heavier'], [/\bwarmer\b/i, 'cooler'], [/\bwith\b/i, 'without']]
-    : [[/\byou\b/i, 'we'], [/\byour\b/i, 'our'], [/\bwe\b/i, 'they'], [/\bour\b/i, 'their'], [/\bI\b/, 'we'], [/\bme\b/i, 'us'], [/\bhere\b/i, 'there'], [/\bnow\b/i, 'later'], [/\bnear\b/i, 'far from'], [/\binside\b/i, 'outside'], [/\bavailable\b/i, 'unavailable'], [/\bopen\b/i, 'closed'], [/\bcan\b/i, 'cannot']]
-  for (const [pattern, replacement] of phraseReplacements) if (pattern.test(text)) return text.replace(pattern, replacement)
-  const words = text.split(/\s+/)
-  const punctuation = text.match(/[,.!?;:]$/)?.[0] ?? ''
-  const generic = variant === 0 ? 'right now' : 'later today'
-  if (words.length >= 2) return `${generic}${punctuation || '.'}`
-  const oneWordAlternates: Record<string, string> = { 'before?': 'after?', 'after?': 'before?', 'yes.': 'no.', 'no.': 'yes.', 'here.': 'there.', 'today.': 'tomorrow.' }
-  return oneWordAlternates[text.toLowerCase()] ?? `${generic}${punctuation || '.'}`
+const MUTATION_RULES: Array<[RegExp, string]> = [
+  [/\bdoes\b/i, 'do'], [/\bdo\b/i, 'does'], [/\bdid\b/i, 'do'],
+  [/\bis\b/i, 'are'], [/\bare\b/i, 'is'], [/\bwas\b/i, 'were'], [/\bwere\b/i, 'was'],
+  [/\bhas\b/i, 'have'], [/\bhave\b/i, 'has'], [/\bhad\b/i, 'have'],
+  [/\bcould\b/i, 'can'], [/\bwould\b/i, 'will'], [/\bshould\b/i, 'must'], [/\bmust\b/i, 'should'],
+  [/\bcan\b(?!['’]t)/i, 'cannot'], [/\bwill\b/i, 'would'], [/\bmay\b/i, 'might'], [/\bmight\b/i, 'may'],
+  [/\bthis\b/i, 'that'], [/\bthese\b/i, 'those'], [/\ba\b/i, 'the'], [/\ban\b/i, 'the'],
+  [/\btoday\b/i, 'tomorrow'], [/\bbefore\b/i, 'after'], [/\bafter\b/i, 'before'],
+  [/\bfirst\b/i, 'later'], [/\bmore\b/i, 'less'], [/\blighter\b/i, 'heavier'], [/\bwarmer\b/i, 'cooler'],
+  [/\bwith\b/i, 'without'], [/\bwithout\b/i, 'with'], [/\bnear\b/i, 'far from'],
+  [/\bavailable\b/i, 'unavailable'], [/\bopen\b/i, 'closed'], [/\byour\b/i, 'our'], [/\bour\b/i, 'their'],
+  [/\bwe\b/i, 'they'], [/\bI’m\b|\bI'm\b/i, 'I was'], [/\bI’ll\b|\bI'll\b/i, 'I can'], [/\bI’d\b|\bI'd\b/i, 'I will'], [/\bI’ve\b|\bI've\b/i, 'I had'], [/\bme\b/i, 'us'], [/\bus\b/i, 'them'],
+  [/\bno longer\b/i, 'still'], [/\bbecause\b/i, 'although'], [/\bunless\b/i, 'if'],
+  [/\bsome\b/i, 'any'], [/\ba little\b/i, 'a few'], [/\ba few\b/i, 'a little'],
+  [/\bone\b/i, 'two'], [/\btwo\b/i, 'one'], [/\baltogether\b/i, 'each'],
+  [/\bnext to\b/i, 'across from'], [/\byes\b/i, 'no'],
+]
+
+const DISTRACTOR_OVERRIDES: Record<string, [string, string]> = {
+  'build-d2-snack-hunt': ['do you', 'find it?'],
+  'build-d2-restroom': ['It’s across from', 'near the back exit.'],
+  'build-d3-total': ['It’s 860 yen', 'each.'],
+  'build-d4-person-hunt': ['do you', 'see them?'],
+  'build-d5-card-fix': ['How many', 'are'],
+  'build-d5-price-tag': ['Let me check the receipt', 'for us.'],
+  'build-d5-receipt': ['Does you', 'have a receipt?'],
+  'build-d6-hunt': ['How many', 'are'],
+  'build-d6-fix': ['does the screen', 'showed?'],
+  'build-d8-shoes-fit': ['They feel quite loose', 'Let’s try a smaller size.'],
+  'build-d9-work-shirt': ['Does you', 'mind to iron'],
+  'build-d9-weekend-style': ['What does you', 'enjoy to do'],
+  'build-d10-purchase-hunt': ['When do you', 'bought them?'],
+  'build-d10-stock-arrival': ['We’re going', 'receive less'],
+  'build-d10-fitting-history': ['Was you trying', 'when you notice the damage?'],
+  'build-d11-exchange-fix': ['Are', 'damage?'],
+  'build-d11-exchange-hunt': ['Does you', 'other color?'],
+  'build-d12-best-outfit': ['Which colors', 'does you'],
+  'build-d12-as-as': ['lighter than the gray one,', 'but it’s cooler.'],
+  'build-d14-running-profile': ['has you', 'have you run'],
+  'build-d14-since-when': ['So you walked', 'until April.'],
+  'build-d14-duration-rush': ['has you', 'have you climbed'],
+  'build-d15-safety-rush': ['You must', 'an extra pair of gloves.'],
+  'build-d16-rainy-run': ['If it rained yesterday,', 'would you still run outside?'],
+  'build-d16-if-weather': ['If it will rain', 'you would want a'],
+  'build-d16-condition-hunt': ['How long', 'does it stay cold?'],
+  'build-d17-wet-boots': ['Do water come', 'when you step in puddles?'],
+  'build-d18-expedition-kit': ['Are rain', 'during trip?'],
+  'build-d20-laptop-that': ['Which colors', 'does you'],
+  'build-d22-keeps-cool': ['It keep', 'is on heavy load.'],
+  'build-d23-headphones-pairing': ['Is', 'charge?'],
+  'build-d23-although-battery': ['off because', 'have plenty of charge.'],
+  'build-d23-trouble-rush': ['So the update has not', 'caused the crash.'],
+  'build-d24-repair-handoff': ['She say the screen', 'and she have the receipt.'],
+  'build-d24-specialist-request': ['I’ll ask our repair specialist', 'to replace the device.'],
+  'build-d25-coffee-order': ['A tea with', 'some sugar.'],
+  'build-d25-order-rush': ['One sandwich and', 'some juice.'],
+  'build-d26-sugar-amount': ['Just a few', 'packets of sugar.'],
+  'build-d26-party-order': ['How much people', 'are the meeting'],
+  'build-d27-would-like': ['Two grilled chicken sandwiches.', 'One chicken salad.'],
+  'build-d27-polite-rush': ['I’d recommend the fruit tart.', 'you should avoid the chocolate tart.'],
+  'build-d28-nut-allergy': ['Does you', 'like a spicy food?'],
+  'build-d29-another-drink': ['I’ll bring you the same lemonade.', 'I’ll take away your lemonade.'],
+  'build-d29-soup-sold-out': ['What colors', 'were the soup?'],
+  'build-d31-timeline-rush': ['have already been waiting', 'for fourteen minutes'],
+  'build-d32-handoff-rush': ['You asked', 'a taxi at seven.'],
+  'build-d33-room-key-deduction': ['Do the 3:20', 'were used?'],
+  'build-d33-inference-rush': ['Someone might take', 'on purpose.'],
+  'build-d35-breakfast-confirm': ['Did your confirmation email', 'show the room-only plan?'],
+  'build-d35-payment-confirm': ['You paid at the front desk,', 'haven’t you?'],
+  'build-d39-regret-queue': ['You regret to check', 'after you washed it.'],
+  'build-d44-briefing-queue': ['He say the suit', 'the sleeves needs'],
+  'build-d45-delivery-trace': ['What destinations', 'are printed'],
+  'build-d45-investigation-queue': ['may be submitted twice.', 'before checking both records.'],
+  'build-d47-crossstore-hunt': ['Will something', 'as something large?'],
+  'build-d47-device-troubleshoot': ['Does this device', 'work in another outlet?'],
+}
+
+const INVALID_DISTRACTOR_PATTERNS = [
+  /^(right now|later today|at the moment)[.!?]?$/i,
+  /\b(could|would|should|must|can|may|might) (has|had)\b/i,
+  /\b(for|to|with|without|from|at|in|on|by|about|of) (i|we|he|she|they)\b/i,
+  /\b(bring|give|tell|show|ask|help|replace) (i|we|he|she|they)\b/i,
+  /\b(do|does|did) (on|in|at|available|unavailable|possible|restarting)\b/i,
+  /\b(is|are|was|were) (do|does|did)\b/i,
+  /\b(this|that) two\b/i,
+  /\b(we|they|he|she)['’]m\b/i,
+  /\bcannot['’]t\b/i,
+  /\b(a|an|the|to|of|for|with|without|from|at|in|on|by|and|or|but|than|as|our|your|their|my)\s*[,.!?;:]?$/i,
+]
+
+function mutationCandidates(text: string) {
+  return MUTATION_RULES
+    .filter(([pattern]) => pattern.test(text))
+    .map(([pattern, replacement]) => text.replace(pattern, replacement).replace(/\s+/g, ' ').trim())
+}
+
+function validDistractor(text: string, targetText: Set<string>) {
+  const normalized = text.trim().toLowerCase()
+  const words = text.trim().split(/\s+/).filter(Boolean)
+  return Boolean(normalized)
+    && !targetText.has(normalized)
+    && words.length <= 8
+    && !INVALID_DISTRACTOR_PATTERNS.some((pattern) => pattern.test(text))
 }
 
 function makeChunkBank(id: string, parts: string[]): { chunks: BuildChunk[]; targetChunkIds: string[] } {
   const targets = parts.map((text, index) => ({ id: `${id}-c${index + 1}`, text }))
   const targetText = new Set(parts.map((part) => part.toLowerCase()))
-  const pickMutation = (variant: 0 | 1, excluded?: string) => {
-    const candidates = variant === 0 ? parts : [...parts].reverse()
-    for (const part of candidates) {
-      const candidate = mutateChunk(part, variant)
-      const generic = /^(right now|later today)[,.!?;:]?$/i.test(candidate)
-      if (!generic && candidate !== excluded && !targetText.has(candidate.toLowerCase())) return candidate
-    }
-    const fallback = variant === 0 ? 'right now.' : 'later today.'
-    return fallback === excluded ? 'at the moment.' : fallback
-  }
-  const mutationA = pickMutation(0)
-  const mutationB = pickMutation(1, mutationA)
+  const override = DISTRACTOR_OVERRIDES[id] ?? []
+  const generated = parts.flatMap((part) => mutationCandidates(part))
+  const candidates = [...override, ...generated]
+    .filter((candidate) => validDistractor(candidate, targetText))
+    .filter((candidate, index, all) => all.findIndex((item) => item.toLowerCase() === candidate.toLowerCase()) === index)
+  if (candidates.length < 2) throw new Error(`${id}: could not produce two contextual distractors`)
+  const [mutationA, mutationB] = candidates
   const distractors: BuildChunk[] = [{ id: `${id}-x1`, text: mutationA, distractor: true }, { id: `${id}-x2`, text: mutationB, distractor: true }]
   const chunks: BuildChunk[] = []
   targets.forEach((target, index) => { if (index === 1) chunks.push(distractors[0]); chunks.push(target); if (index === Math.max(1, targets.length - 2)) chunks.push(distractors[1]) })
@@ -352,15 +506,29 @@ function makeChunkBank(id: string, parts: string[]): { chunks: BuildChunk[]; tar
   return { chunks, targetChunkIds: targets.map((item) => item.id) }
 }
 
-function slotLabels(sentence: string, count: number, grammar: GrammarTargetRef[]) {
-  const keys = new Set(grammar.map((ref) => ref.key)); let labels: string[]
-  if (sentence.trim().endsWith('?')) labels = ['QUESTION START', 'SUBJECT / CORE', 'ACTION', 'OBJECT / DETAIL', 'TIME / CONDITION', 'END']
-  else if ([...keys].some((key) => ['CONDITIONS_BASIC', 'CONDITIONAL_SECOND', 'CONDITIONAL_SECOND_ADVICE', 'CONDITIONAL_THIRD'].includes(key))) labels = ['CONDITION', 'SUBJECT', 'ACTION', 'RESULT', 'DETAIL', 'END']
-  else if (keys.has('REPORTED_SPEECH')) labels = ['REPORT', 'SUBJECT', 'MESSAGE', 'DETAIL', 'TIME', 'END']
-  else if (keys.has('PASSIVE')) labels = ['SUBJECT', 'PASSIVE VERB', 'DETAIL', 'REASON / TIME', 'EXTRA', 'END']
-  else if (keys.has('DISCOURSE_CONNECTORS')) labels = ['FIRST POINT', 'CONNECTOR', 'NEXT POINT', 'ACTION', 'DETAIL', 'END']
-  else labels = ['SUBJECT / TOPIC', 'ACTION', 'OBJECT / COMPLEMENT', 'DETAIL', 'REASON / TIME', 'END']
-  return labels.slice(0, count)
+function slotLabels(parts: string[], grammar: GrammarTargetRef[]) {
+  const keys = new Set(grammar.map((ref) => ref.key))
+  const questionStart = parts.join(' ').trim().endsWith('?')
+    ? parts.findIndex((part) => /^(what|where|when|why|who|whose|which|how|do|does|did|is|are|was|were|have|has|had|can|could|will|would|should|may|might)\b/i.test(part.trim()))
+    : -1
+  return parts.map((part, index) => {
+    const low = part.toLowerCase().replace(/^[“”'\"]+/, '').trim()
+    const last = index === parts.length - 1
+    if (/^(yes|no|of course|certainly|great|understood|i see|i understand|i’m sorry|i'm sorry|not necessarily)[,.!]?\b/.test(low)) return 'RESPONSE / OPENING'
+    if (/^(isn’t|isn't|aren’t|aren't|wasn’t|wasn't|weren’t|weren't|don’t|don't|doesn’t|doesn't|didn’t|didn't|haven’t|haven't|hasn’t|hasn't|hadn’t|hadn't|can’t|can't|couldn’t|couldn't|won’t|won't|wouldn’t|wouldn't|shouldn’t|shouldn't)\b/.test(low)) return 'TAG QUESTION'
+    if (index === questionStart) return /^(what|where|when|why|who|whose|which|how)\b/.test(low) ? 'QUESTION WORD / FRAME' : 'QUESTION FRAME'
+    if (/^(however|therefore|otherwise|but|and|so|then)\b/.test(low)) return 'CONNECTOR'
+    if (/^(if|unless|although|while|since|before|after|when)\b/.test(low)) return 'CONDITION / TIME'
+    if (/^(i|you|we|they|he|she|it|this|that|these|those|someone)\b[,.!?]?$/.test(low)) return 'SUBJECT'
+    if (/^(am|is|are|was|were|do|does|did|have|has|had|can|could|will|would|should|must|may|might)[,.!?]?$/.test(low)) return 'AUXILIARY / VERB'
+    if (/^to\s+\w+/.test(low)) return 'ACTION'
+    if (/^(in|on|at|for|with|without|from|near|behind|under|through|toward|before|after)\b/.test(low)) return last ? 'DETAIL / END' : 'DETAIL'
+    if (keys.has('REPORTED_SPEECH') && index === 0) return 'REPORT'
+    if (keys.has('PASSIVE') && /\b(am|is|are|was|were|be|been|being)\b|\b\w+ed\b/.test(low)) return 'PASSIVE / STATE'
+    if (questionStart >= 0 && index > questionStart) return last ? 'QUESTION DETAIL / END' : 'QUESTION CORE'
+    if (last) return 'DETAIL / END'
+    return index === 0 ? 'SUBJECT / CORE' : 'CORE MESSAGE'
+  })
 }
 
 function grammarForBuild(activity: Chapter1Activity, sentence: string) {
@@ -401,8 +569,8 @@ function responseCopy(kind: Chapter1Activity['kind'], response: string) {
 function toBuildActivity(activity: Chapter1Activity, globalIndex: number): BuildActivity {
   const chapter = ((Math.floor((dayFromId(activity.id) - 1) / 6) + 1) as BuildChapter)
   const day = dayFromId(activity.id); const activityNo = activityNoFromIndex(globalIndex); const target = targetFromActivity(activity)
-  const parts = splitIntoChunks(target.sentence); const bank = makeChunkBank(`build-${activity.id}`, parts); const grammarTargets = grammarForBuild(activity, target.sentence); const override = TARGET_OVERRIDES[activity.id]; const response = override?.response ? { response: override.response, responseJa: override.responseJa ?? japaneseFor(override.response) ?? override.response } : responseCopy(activity.kind, target.response)
-  const labels = slotLabels(target.sentence, parts.length, grammarTargets)
+  const buildId = `build-${activity.id}`; const parts = splitIntoChunks(buildId, target.sentence); const bank = makeChunkBank(buildId, parts); const grammarTargets = grammarForBuild(activity, target.sentence); const override = TARGET_OVERRIDES[activity.id]; const response = override?.response ? { response: override.response, responseJa: override.responseJa ?? japaneseFor(override.response) ?? override.response } : responseCopy(activity.kind, target.response)
+  const labels = slotLabels(parts, grammarTargets)
   return { id: `build-${activity.id}`, sourceActivityId: activity.id, chapter, day, activityNo, title: activity.title, skill: activity.skill, store: STORE_BY_CHAPTER[chapter], customerName: activity.customer.name, customerOpening: activity.customer.opening, customerOpeningJa: japaneseFor(activity.customer.opening) ?? activity.customer.opening, intentJa: activity.objective, targetSentence: target.sentence, targetJapanese: override?.targetJapanese ?? japaneseFor(target.sentence) ?? target.sentence, customerResponse: response.response, customerResponseJa: response.responseJa, grammarTargets, chunks: bank.chunks, targetChunkIds: bank.targetChunkIds, slotLabels: labels, hintsJa: buildHints(grammarTargets, parts, labels), bestRoute: ['Customerの状況とYOUR INTENTから、返答の目的を一つに絞る。', grammarLearningTip(grammarTargets), `文を${parts.length}個の意味chunkに分けて、英語として自然な順番に並べる。`] }
 }
 
