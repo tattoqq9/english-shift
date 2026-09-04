@@ -11,6 +11,12 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
       </section>
 
       <section className="more-card-grid">
+        <button className="more-card" onClick={() => onNavigate('onboarding')}>
+          <span>GUIDE</span>
+          <strong>Getting Started</strong>
+          <p>SELECT → BUILD → MASTERYの学習ループを、初回チュートリアルでもう一度確認できます。進捗は変更しません。</p>
+          <em>View tutorial →</em>
+        </button>
         <button className="more-card" onClick={() => onNavigate('lab')}>
           <span>EXPERIMENTAL</span>
           <strong>Game Lab</strong>

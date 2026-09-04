@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.4.7",
+  "version": "0.4.8",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,10 +10,11 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js",
+    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js && node .core-build/scripts/onboarding-smoke.js",
     "grammar:audit": "tsc -p tsconfig.core.json && node .core-build/scripts/grammar-audit.js",
     "mastery:check": "tsc -p tsconfig.core.json && node .core-build/scripts/mastery-smoke.js",
     "review:check": "tsc -p tsconfig.core.json && node .core-build/scripts/review-smoke.js",
+    "onboarding:check": "tsc -p tsconfig.core.json && node .core-build/scripts/onboarding-smoke.js",
     "build:check": "tsc -p tsconfig.core.json && node .core-build/scripts/build-smoke.js",
     "nav:check": "tsc -p tsconfig.core.json && node .core-build/scripts/navigation-smoke.js",
     "advanced:check": "tsc -p tsconfig.core.json && node .core-build/scripts/advanced-smoke.js",

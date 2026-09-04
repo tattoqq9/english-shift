@@ -14,9 +14,11 @@ import { HomeScreen } from './screens/HomeScreen'
 import { LearnScreen } from './screens/LearnScreen'
 import { MasteryScreen } from './screens/MasteryScreen'
 import { MoreScreen } from './screens/MoreScreen'
+import { OnboardingScreen } from './screens/OnboardingScreen'
 import { Level2BuildScreen } from './screens/Level2BuildScreen'
 import { RepairLabScreen } from './screens/RepairLabScreen'
 import { FlowLabScreen } from './screens/FlowLabScreen'
+import { completeOnboarding, shouldShowOnboarding } from './core/onboarding'
 import { DEBUG_UNLOCK_ALL_DAYS } from './runtimeMode'
 
 export type AppView =
@@ -24,6 +26,7 @@ export type AppView =
   | 'learn'
   | 'mastery'
   | 'more'
+  | 'onboarding'
   | 'chapter1'
   | 'chapter2'
   | 'chapter3'
@@ -38,13 +41,40 @@ export type AppView =
   | 'flow'
   | 'lab'
 
+function initialView(): AppView {
+  try {
+    return shouldShowOnboarding(window.localStorage) ? 'onboarding' : 'home'
+  } catch {
+    return 'home'
+  }
+}
+
 export default function App() {
-  const [view, setView] = useState<AppView>('home')
+  const [view, setView] = useState<AppView>(initialView)
+  const [onboardingReturnView, setOnboardingReturnView] = useState<AppView | null>(null)
 
   const navigate = (next: AppView) => {
+    if (next === 'onboarding' && view !== 'onboarding') setOnboardingReturnView(view)
     setView(next)
     const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
     requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }))
+  }
+
+  const finishOnboarding = (destination: AppView, reason: 'completed' | 'skipped') => {
+    try { completeOnboarding(window.localStorage, reason) } catch { /* do not block navigation */ }
+    setOnboardingReturnView(null)
+    navigate(destination)
+  }
+
+  if (view === 'onboarding') {
+    return (
+      <div className="app-shell app-shell-v041">
+        <OnboardingScreen
+          onStart={() => finishOnboarding('chapter1', 'completed')}
+          onSkip={() => finishOnboarding(onboardingReturnView ?? 'home', 'skipped')}
+        />
+      </div>
+    )
   }
 
   return (
