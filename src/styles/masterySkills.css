@@ -1,0 +1,305 @@
+/* v0.4.7 · Ability-separated Grammar Mastery */
+
+.mastery-skill-overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.mastery-skill-summary-card {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line, rgba(15, 23, 42, 0.12));
+  border-radius: 18px;
+  background: var(--card, #fff);
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+}
+
+.mastery-skill-summary-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mastery-skill-summary-head span,
+.mastery-skill-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.mastery-skill-summary-head strong {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.mastery-skill-summary-card h3 {
+  margin: 10px 0 4px;
+  font-size: 1rem;
+}
+
+.mastery-skill-summary-card p {
+  min-height: 2.8em;
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  opacity: 0.72;
+}
+
+.mastery-skill-summary-card > small {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.72rem;
+  opacity: 0.66;
+}
+
+.mastery-skill-track {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.09);
+}
+
+.mastery-skill-track > span {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: currentColor;
+  transition: width 180ms ease;
+}
+
+.skill-select { color: #2563eb; }
+.skill-build { color: #7c3aed; }
+.skill-repair { color: #c2410c; }
+
+.mastery-migration-note {
+  border-style: dashed;
+}
+
+.mastery-skill-focus-list {
+  gap: 8px;
+}
+
+.mastery-skill-focus-row,
+.mastery-overall-focus-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.mastery-overall-focus-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.mastery-skill-focus-copy,
+.mastery-overall-focus-row > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mastery-skill-focus-copy strong,
+.mastery-overall-focus-row strong {
+  overflow-wrap: anywhere;
+}
+
+.mastery-skill-focus-copy small,
+.mastery-overall-focus-row small,
+.mastery-skill-focus-score small {
+  opacity: 0.66;
+}
+
+.mastery-skill-focus-score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.mastery-skill-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: 58px;
+  padding: 4px 7px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.035);
+  line-height: 1;
+}
+
+.mastery-concept-grid-v047 {
+  align-items: stretch;
+}
+
+.mastery-concept-card-v047 {
+  min-width: 0;
+}
+
+.mastery-skill-bars {
+  display: grid;
+  gap: 7px;
+  margin: 12px 0;
+}
+
+.mastery-skill-bar-row {
+  display: grid;
+  grid-template-columns: 64px minmax(72px, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mastery-skill-bar-row .mastery-skill-badge {
+  min-width: 0;
+  width: 64px;
+  padding-inline: 5px;
+  font-size: 0.64rem;
+}
+
+.mastery-skill-bar-row strong {
+  text-align: right;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.mastery-next-recommendation {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.13);
+  font-size: 0.76rem;
+}
+
+.mastery-next-recommendation span {
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.55;
+}
+
+.mastery-review-ability-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 1040px;
+  margin: 0 auto 14px;
+  padding: 12px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.mastery-review-ability-head > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mastery-review-ability-head > div:first-child span {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  opacity: 0.58;
+}
+
+.mastery-review-ability-head > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.mastery-review-ability-head > div:last-child span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.07);
+  font-size: 0.72rem;
+}
+
+.mastery-review-hint-total {
+  margin: 12px 0;
+  text-align: center;
+  font-size: 0.78rem;
+  opacity: 0.68;
+}
+
+.weakness-review-change-list .mastery-skill-badge {
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+@media (max-width: 820px) {
+  .mastery-skill-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .mastery-skill-summary-card p {
+    min-height: 0;
+  }
+
+  .mastery-review-ability-head {
+    margin-inline: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mastery-skill-summary-card {
+    padding: 15px;
+  }
+
+  .mastery-skill-summary-head strong {
+    font-size: 1.55rem;
+  }
+
+  .mastery-skill-focus-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .mastery-skill-focus-score {
+    grid-column: 2;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .mastery-skill-bar-row {
+    grid-template-columns: 58px minmax(0, 1fr) 34px;
+    gap: 6px;
+  }
+
+  .mastery-skill-bar-row .mastery-skill-badge {
+    width: 58px;
+    font-size: 0.60rem;
+  }
+
+  .mastery-review-ability-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mastery-review-ability-head > div:last-child {
+    justify-content: flex-start;
+  }
+
+  .weakness-review-change-list > div {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mastery-skill-track > span { transition: none; }
+}
