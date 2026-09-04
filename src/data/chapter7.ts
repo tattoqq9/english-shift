@@ -1,0 +1,386 @@
+import type { Chapter1Activity, Chapter1Day } from '../core/chapter1.js'
+
+export const chapter7Days: Chapter1Day[] = [
+  {
+    day: 37,
+    title: 'Alternative Solutions',
+    subtitle: '仮定法過去を使い、今すぐ実現できない条件でも現実的な代替案を提案する。',
+    newLanguage: ['subjunctive past', 'If I were you / If we had...'],
+    reviewLanguage: ['if clauses', 'would / could'],
+    gameFocus: 'Alternative Recommendation',
+    activityIds: ['d37-soldout-coat', 'd37-gift-alternative', 'd37-alternative-queue'],
+    canDo: ['現実と異なる条件を仮定して提案する', 'できないことを断るだけでなく代案を示す', 'would / could を使った柔らかい提案を理解する'],
+  },
+  {
+    day: 38,
+    title: 'What Went Wrong?',
+    subtitle: '仮定法過去完了を使い、過去の判断と現在の結果を結び付けてトラブルを振り返る。',
+    newLanguage: ['subjunctive past perfect', 'If ... had + p.p., ... would have ...'],
+    reviewLanguage: ['past perfect', 'incident timeline'],
+    gameFocus: 'Incident Review',
+    activityIds: ['d38-giftwrap-incident', 'd38-return-deadline', 'd38-counterfactual-queue'],
+    canDo: ['過去に違う行動をしていた場合の結果を理解する', '責任追及と改善提案を区別する', '時系列証拠から原因を判断する'],
+  },
+  {
+    day: 39,
+    title: 'Customer Regret',
+    subtitle: 'wish / as if を使い、客の後悔や現実とは異なる希望を読み取る。',
+    newLanguage: ['wish', 'as if / as though'],
+    reviewLanguage: ['subjunctive', 'past tense'],
+    gameFocus: 'Regret & Expectation',
+    activityIds: ['d39-wish-size', 'd39-asif-complaint', 'd39-regret-queue'],
+    canDo: ['wishが示す「現実とは違う希望」を理解する', 'as if / as though を断定と混同しない', '客の後悔に対して現実的な次の行動を提案する'],
+  },
+  {
+    day: 40,
+    title: 'Premium Comparison',
+    subtitle: '高度な比較表現を使い、価格だけではない差を説明して商品を比較する。',
+    newLanguage: ['advanced comparison', 'far / slightly / not as ... as'],
+    reviewLanguage: ['comparative', 'superlative'],
+    gameFocus: 'Premium Recommendation',
+    activityIds: ['d40-watch-compare', 'd40-bag-comparison', 'd40-premium-queue'],
+    canDo: ['差の大きさを含めて比較する', 'not as ... as を正確に理解する', '高価格商品でも客の優先条件に合うか判断する'],
+  },
+  {
+    day: 41,
+    title: 'Policy Explanation',
+    subtitle: 'not always / not necessarily / no longer と allow / prevent / enable で、変化するルールを説明する。',
+    newLanguage: ['partial negation', 'no longer / hardly / rarely', 'allow / prevent / enable'],
+    reviewLanguage: ['passive voice', 'policy language'],
+    gameFocus: 'Policy Judgment',
+    activityIds: ['d41-sale-return', 'd41-warranty-policy', 'd41-policy-handoff'],
+    canDo: ['not necessarily を「必ず〜ではない」と理解する', '規則が何を許可・防止するか説明する', '例外条件を確認してから判断する'],
+  },
+  {
+    day: 42,
+    title: 'Manager Shift',
+    subtitle: 'Chapter 7の仮定・比較・後悔・ポリシー判断を、複数の難しい接客で統合する。',
+    newLanguage: [],
+    reviewLanguage: ['Chapter 7 all', 'earlier chapters'],
+    gameFocus: 'Manager Decisions',
+    activityIds: ['d42-vip-incident', 'd42-manager-handoff', 'd42-manager-queue'],
+    canDo: ['複数証言から公平な結論を出す', '重要な事実だけをManagerへ引き継ぐ', '難しい客にも条件と代替案を分かりやすく提示する'],
+  },
+]
+
+export const chapter7Activities: Chapter1Activity[] = [
+  {
+    id: 'd37-soldout-coat', kind: 'dialogue', title: 'The coat is sold out', skill: 'Hypothetical Alternative',
+    objective: '在庫がない状況で、仮定法を使って柔らかく代替案を示す。', grammar: ['If we had...', 'would / could'],
+    customer: { id: 'grace', name: 'Grace', roleLabel: '売り切れのコートを探している', opening: 'I really wanted the navy coat in medium, but I was told it is sold out.' },
+    bestRoute: ['在庫切れを認める', '仮定条件と現実を分ける', '近い代替案を提案する'],
+    choices: [
+      { id: 'd37c-best', text: 'If we had the navy coat in medium, I’d show it to you first. Since we don’t, I can check the same style in charcoal or another store.', response: 'That would help. Please check the other store too.', quality: 'best', points: 100, explanation: '実現しない条件をIf we hadで示しつつ、現実的な代替案へ自然につないでいます。' },
+      { id: 'd37c-good', text: 'We do not have the navy coat, but I can check another color.', response: 'Okay. What other colors are there?', quality: 'good', points: 86, explanation: '業務上は十分ですが、仮定法を使った柔らかい対比はありません。' },
+      { id: 'd37c-poor', text: 'If we have it, you can buy it, but we do not.', response: 'I already know it is sold out.', quality: 'poor', points: 25, explanation: '現在の非現実条件に対して時制が不自然で、代替案もありません。' },
+    ],
+  },
+  {
+    id: 'd37-gift-alternative', kind: 'information-hunt', title: 'A gift without the exact item', skill: 'Alternative Hunt',
+    objective: '希望商品がないとき、用途と優先条件を聞いて代替ギフトを特定する。', grammar: ['If I were you', 'would'],
+    customer: { id: 'daniel', name: 'Daniel', roleLabel: '売り切れ商品に代わる贈り物を探している', opening: 'The leather wallet my wife wanted is unavailable. I still need a birthday gift for her today.' },
+    bestRoute: ['使い方を聞く', '色や価格より優先条件を確認する', '条件に合う代替商品を選ぶ'], maxQuestions: 2,
+    questions: [
+      { id: 'd37g-use', text: 'Does she prefer something small for everyday use or something larger for travel?', response: 'Something small for everyday use.', reveal: 'Everyday use · compact', value: 5 },
+      { id: 'd37g-style', text: 'Would she rather have a classic design or something colorful?', response: 'A classic design would be better.', reveal: 'Classic design', value: 5 },
+      { id: 'd37g-paper', text: 'What wrapping paper color do you want?', response: 'Maybe gold.', reveal: 'Gold wrapping paper', value: 1 },
+      { id: 'd37g-age', text: 'How old is your wife?', response: 'She is 39.', reveal: 'Age 39', value: 0 },
+    ],
+    candidates: [
+      { id: 'd37g-a', name: 'Compact card case · black', details: 'Compact, classic, everyday use', correct: true },
+      { id: 'd37g-b', name: 'Large travel organizer · brown', details: 'Large, travel focused' },
+      { id: 'd37g-c', name: 'Bright red coin pouch', details: 'Compact but colorful' },
+      { id: 'd37g-d', name: 'Decorative key chain', details: 'Not a wallet alternative' },
+    ],
+  },
+  {
+    id: 'd37-alternative-queue', kind: 'rapid', title: 'Three alternatives', skill: 'Alternative Queue',
+    objective: '3人の客へ、現実にない条件と実際に可能な代案を区別して返答する。', grammar: ['If I were you', 'would / could'],
+    customer: { id: 'mia', name: 'Department queue', roleLabel: '代替案を求める客が続く', opening: 'Three customers need alternatives because their first choice is unavailable.' },
+    bestRoute: ['できないことを明確にする', '仮定表現を使う', '実行できる次の選択肢を出す'],
+    scenarios: [
+      { id: 'd37q-1', customer: 'Guest 1', line: 'This suitcase is sold out. I leave tomorrow morning.', choices: [
+        { id: 'd37q1-best', text: 'If I were you, I’d choose the slightly smaller model we have today rather than wait for restock.', response: 'That makes sense. Show me the smaller one.', quality: 'best', points: 100, explanation: '期限を考慮した現実的な仮定的助言です。' },
+        { id: 'd37q1-good', text: 'We have a smaller suitcase today.', response: 'Can I see it?', quality: 'good', points: 86, explanation: '代案は出せていますが、客の期限を踏まえた助言は弱めです。' },
+        { id: 'd37q1-poor', text: 'If you waited forever, it would come back someday.', response: 'I leave tomorrow.', quality: 'poor', points: 10, explanation: '客の時間制約を無視しています。' },
+      ]},
+      { id: 'd37q-2', customer: 'Guest 2', line: 'I wanted the silver earrings, but only gold is available.', choices: [
+        { id: 'd37q2-best', text: 'If silver is important, I could check another branch. If not, I can show you the same design in gold.', response: 'Please check another branch first.', quality: 'best', points: 100, explanation: '条件の重要度に応じて2つの代案を提示しています。' },
+        { id: 'd37q2-good', text: 'We only have gold here.', response: 'I see.', quality: 'good', points: 75, explanation: '事実は伝えていますが代案がありません。' },
+        { id: 'd37q2-poor', text: 'Gold and silver are the same.', response: 'They are not the same to me.', quality: 'poor', points: 15, explanation: '客の希望を否定しています。' },
+      ]},
+      { id: 'd37q-3', customer: 'Guest 3', line: 'The shoes in my size are gone, but I need them for a wedding.', choices: [
+        { id: 'd37q3-best', text: 'If we had your size, I’d recommend this pair. Since we don’t, let me check a similar formal shoe in your size.', response: 'Yes, please.', quality: 'best', points: 100, explanation: '非現実条件と実際の代替案を分けています。' },
+        { id: 'd37q3-good', text: 'Let me find another formal shoe in your size.', response: 'Thank you.', quality: 'good', points: 90, explanation: '十分良い対応ですが、今回の文法目標は明示しません。' },
+        { id: 'd37q3-poor', text: 'Buy a different size.', response: 'That would not fit me.', quality: 'poor', points: 10, explanation: 'サイズという必須条件を無視しています。' },
+      ]},
+    ],
+  },
+  {
+    id: 'd38-giftwrap-incident', kind: 'incident-investigation', title: 'The missing gift wrap', skill: 'Counterfactual Incident',
+    objective: '複数スタッフの証言から、包装ミスが起きた原因と改善点を判断する。', grammar: ['If ... had + p.p.', 'would have + p.p.'],
+    customer: { id: 'grace', name: 'Grace', roleLabel: '贈り物が包装されないまま渡された', opening: 'I paid for gift wrapping, but when I picked up the present, it was still in the regular shopping bag.' },
+    bestRoute: ['受注記録を確認する証言を選ぶ', '引継ぎ時点を確認する', '原因と反実仮想の改善を結び付ける'], maxInterviews: 2,
+    witnesses: [
+      { id: 'd38i-cashier', name: 'Cashier', role: 'Sales floor', statement: 'I added gift wrapping to the order at 2:05 and wrote “gift wrap” on the receipt.', evidence: '2:05 · Gift wrap added to order', value: 5 },
+      { id: 'd38i-wrap', name: 'Wrapping Desk', role: 'Gift service', statement: 'The package arrived at our desk at 2:20, but the service tag had fallen off, so we treated it as a normal pickup.', evidence: '2:20 · Service tag missing at wrapping desk', value: 5 },
+      { id: 'd38i-security', name: 'Security', role: 'Entrance', statement: 'The customer entered through the east door.', evidence: 'Customer used east entrance', value: 0 },
+      { id: 'd38i-stock', name: 'Stock Clerk', role: 'Back room', statement: 'We had plenty of wrapping paper that afternoon.', evidence: 'Wrapping paper was in stock', value: 1 },
+    ],
+    conclusions: [
+      { id: 'd38i-best', text: 'If the service tag had stayed with the package, the wrapping desk would have known that gift wrapping was required.', correct: true, explanation: '証拠が示す原因はタグ紛失であり、過去の条件と結果を仮定法過去完了で正しく結んでいます。' },
+      { id: 'd38i-wrong1', text: 'If the customer had used another entrance, the gift would have been wrapped.', correct: false, explanation: '入口は包装処理と関係ありません。' },
+      { id: 'd38i-wrong2', text: 'If we had bought more wrapping paper, the gift would have been wrapped.', correct: false, explanation: '包装紙は十分にありました。' },
+    ],
+  },
+  {
+    id: 'd38-return-deadline', kind: 'dialogue', title: 'The missed return deadline', skill: 'Counterfactual Explanation',
+    objective: '過去の条件が違っていれば可能だった対応を、責めずに説明する。', grammar: ['If you had...', 'could have'],
+    customer: { id: 'daniel', name: 'Daniel', roleLabel: '返品期限を過ぎた商品を返品したい', opening: 'I bought this jacket forty days ago. I didn’t realize the regular return period was thirty days.' },
+    bestRoute: ['期限超過を説明する', '過去条件を仮定で示す', '現在可能な代替対応を案内する'],
+    choices: [
+      { id: 'd38r-best', text: 'If you had brought it back within thirty days, we could have refunded it. Since the deadline has passed, I can check whether store credit is available.', response: 'I understand. Please check the store credit option.', quality: 'best', points: 100, explanation: '過去に可能だった条件と、今できる代案を分けています。' },
+      { id: 'd38r-good', text: 'The normal return period is thirty days, but I can check another option for you.', response: 'Okay, thank you.', quality: 'good', points: 88, explanation: '業務上は良いですが、反実仮想の構造は使っていません。' },
+      { id: 'd38r-poor', text: 'If you returned it earlier, we refund it.', response: 'But I did not return it earlier.', quality: 'poor', points: 30, explanation: '過去の非現実条件に対して時制が不適切です。' },
+    ],
+  },
+  {
+    id: 'd38-counterfactual-queue', kind: 'rapid', title: 'What could have changed?', skill: 'Counterfactual Queue',
+    objective: '3件の過去トラブルについて、原因と「もし〜だったら」を正しく結ぶ。', grammar: ['would have', 'could have'],
+    customer: { id: 'mia', name: 'Service counter', roleLabel: '過去のトラブルを振り返る客が続く', opening: 'Three customers want to understand what could have prevented their problems.' },
+    bestRoute: ['実際に起きた事実を確認する', '変更可能だった条件を探す', '結果との因果がある仮定だけを選ぶ'],
+    scenarios: [
+      { id: 'd38q-1', customer: 'Guest 1', line: 'My online pickup was delayed because I entered the wrong store location.', choices: [
+        { id: 'd38q1-best', text: 'If you had selected this branch when you ordered, the pickup could have been prepared here.', response: 'That explains it.', quality: 'best', points: 100, explanation: '原因である店舗選択と結果を正しく結んでいます。' },
+        { id: 'd38q1-good', text: 'The order was sent to another branch.', response: 'Yes.', quality: 'good', points: 82, explanation: '事実は正しいですが反実仮想を使っていません。' },
+        { id: 'd38q1-poor', text: 'If you had arrived earlier, the order would have changed stores.', response: 'That would not change the branch.', quality: 'poor', points: 15, explanation: '原因と関係のない条件です。' },
+      ]},
+      { id: 'd38q-2', customer: 'Guest 2', line: 'The engraved name was wrong because the spelling on my order form was wrong.', choices: [
+        { id: 'd38q2-best', text: 'If the spelling had been corrected before engraving, the name would have been printed correctly.', response: 'Right. I should have checked the form.', quality: 'best', points: 100, explanation: '誤記と加工結果の因果関係が明確です。' },
+        { id: 'd38q2-good', text: 'The engraving followed the spelling on the form.', response: 'I see.', quality: 'good', points: 85, explanation: '原因説明は正しいです。' },
+        { id: 'd38q2-poor', text: 'If the box had been bigger, the spelling would have been correct.', response: 'The box was not the problem.', quality: 'poor', points: 10, explanation: '無関係な条件です。' },
+      ]},
+      { id: 'd38q-3', customer: 'Guest 3', line: 'My cake order was cancelled because I did not confirm the pickup time by the deadline.', choices: [
+        { id: 'd38q3-best', text: 'If you had confirmed the pickup time before the deadline, the order would have remained active.', response: 'Understood.', quality: 'best', points: 100, explanation: '期限内確認という必要条件を正しく仮定しています。' },
+        { id: 'd38q3-good', text: 'The order was cancelled after the confirmation deadline.', response: 'Okay.', quality: 'good', points: 84, explanation: '時系列は正しいですが反実仮想はありません。' },
+        { id: 'd38q3-poor', text: 'If you had ordered a different cake, the deadline would not matter.', response: 'That was not the issue.', quality: 'poor', points: 10, explanation: '問題の原因と無関係です。' },
+      ]},
+    ],
+  },
+  {
+    id: 'd39-wish-size', kind: 'dialogue', title: 'I wish I had bought a larger size', skill: 'Wish & Regret',
+    objective: 'wishが現在の事実とは異なる後悔を示すことを理解し、現実的な対応へ進む。', grammar: ['wish + past perfect'],
+    customer: { id: 'mia', name: 'Mia', roleLabel: '購入サイズを後悔している', opening: 'I wish I had bought the larger size. This one feels too tight when I wear a sweater underneath.' },
+    bestRoute: ['wishを過去の後悔として読む', '現在の問題を確認する', '交換可能性を案内する'],
+    choices: [
+      { id: 'd39w-best', text: 'I understand. You wish you had chosen the larger size. Let me check whether we can exchange this one for the next size up.', response: 'Yes, please. That would be great.', quality: 'best', points: 100, explanation: '後悔の意味を確認し、現在可能な交換対応へつないでいます。' },
+      { id: 'd39w-good', text: 'This size is too tight, so I can check a larger one.', response: 'Thank you.', quality: 'good', points: 88, explanation: '対応は正しいですがwishの意味確認は省略しています。' },
+      { id: 'd39w-poor', text: 'You wish this size is larger.', response: 'No, I mean I should have bought a larger size.', quality: 'poor', points: 25, explanation: 'wishの時制と意味を誤っています。' },
+    ],
+  },
+  {
+    id: 'd39-asif-complaint', kind: 'information-hunt', title: 'It looks as if it was used', skill: 'Appearance vs Fact',
+    objective: 'as ifが「そう見える」ことを示すだけで、事実確定ではないことを理解する。', grammar: ['as if / as though'],
+    customer: { id: 'grace', name: 'Grace', roleLabel: '新品のバッグが使用済みに見える', opening: 'The leather near the handle is creased. It looks as if someone had used this bag before.' },
+    bestRoute: ['使用済みと断定しない', '展示品か確認する', 'タグ・在庫記録を確認して判断する'], maxQuestions: 2,
+    questions: [
+      { id: 'd39a-display', text: 'Was this bag taken from the display shelf or from sealed stock?', response: 'It was the display sample.', reveal: 'Display sample', value: 5 },
+      { id: 'd39a-tag', text: 'Is the original sale tag still attached and does the stock record show a previous sale?', response: 'The original tag is attached, and there is no previous sale record.', reveal: 'Original tag · no previous sale', value: 5 },
+      { id: 'd39a-color', text: 'Do you like this shade of brown?', response: 'Yes, the color is fine.', reveal: 'Color acceptable', value: 1 },
+      { id: 'd39a-weather', text: 'Was it raining when you came here?', response: 'No.', reveal: 'No rain', value: 0 },
+    ],
+    candidates: [
+      { id: 'd39a-a', name: 'Display handling caused the crease', details: 'Looks used, but no sale record', correct: true },
+      { id: 'd39a-b', name: 'The bag was definitely returned after use', details: 'No evidence of prior sale' },
+      { id: 'd39a-c', name: 'Rain damaged the leather', details: 'No rain evidence' },
+      { id: 'd39a-d', name: 'Wrong color caused the crease', details: 'Color is unrelated' },
+    ],
+  },
+  {
+    id: 'd39-regret-queue', kind: 'rapid', title: 'Three regrets', skill: 'Regret Queue',
+    objective: 'wishの内容が「今変えたいこと」か「過去に変えたかったこと」かを判断する。', grammar: ['wish', 'past / past perfect'],
+    customer: { id: 'daniel', name: 'Service desk', roleLabel: '買い物の後悔を話す客が続く', opening: 'Three customers describe things they wish were different.' },
+    bestRoute: ['wishの後ろの時制を見る', '現在と過去を区別する', '現実的な次の対応を示す'],
+    scenarios: [
+      { id: 'd39q-1', customer: 'Guest 1', line: 'I wish this suitcase were lighter.', choices: [
+        { id: 'd39q1-best', text: 'You want a lighter suitcase now. I can show you a lighter model.', response: 'Yes, please.', quality: 'best', points: 100, explanation: 'wish + past形で現在と異なる希望を正しく読んでいます。' },
+        { id: 'd39q1-good', text: 'This suitcase is heavy.', response: 'Yes.', quality: 'good', points: 80, explanation: '現状は理解していますが希望への対応がありません。' },
+        { id: 'd39q1-poor', text: 'You wish you had bought it yesterday.', response: 'No, I mean it is too heavy now.', quality: 'poor', points: 10, explanation: '現在の希望を過去の後悔と誤解しています。' },
+      ]},
+      { id: 'd39q-2', customer: 'Guest 2', line: 'I wish I had checked the care label before washing this sweater.', choices: [
+        { id: 'd39q2-best', text: 'You regret not checking the care label before you washed it.', response: 'Exactly.', quality: 'best', points: 100, explanation: 'wish + had + p.p.を過去の後悔として読んでいます。' },
+        { id: 'd39q2-good', text: 'The sweater was washed incorrectly.', response: 'Yes.', quality: 'good', points: 84, explanation: '結果は理解しています。' },
+        { id: 'd39q2-poor', text: 'You want to check the label tomorrow.', response: 'No, the washing already happened.', quality: 'poor', points: 10, explanation: '時系列を誤っています。' },
+      ]},
+      { id: 'd39q-3', customer: 'Guest 3', line: 'I wish the strap were a little longer.', choices: [
+        { id: 'd39q3-best', text: 'You would prefer a longer strap now. Let me check an adjustable version.', response: 'That sounds good.', quality: 'best', points: 100, explanation: '現在の希望として読み、代案を出しています。' },
+        { id: 'd39q3-good', text: 'The strap is short for you.', response: 'Yes.', quality: 'good', points: 84, explanation: '意味は理解しています。' },
+        { id: 'd39q3-poor', text: 'You wish you had returned it last year.', response: 'No, I just want a longer strap.', quality: 'poor', points: 10, explanation: '発言にない過去の後悔を作っています。' },
+      ]},
+    ],
+  },
+  {
+    id: 'd40-watch-compare', kind: 'information-hunt', title: 'Which premium watch fits?', skill: 'Advanced Comparison Hunt',
+    objective: '差の大きさと優先条件を聞き、高価格帯の腕時計を比較する。', grammar: ['far more', 'slightly', 'not as ... as'],
+    customer: { id: 'daniel', name: 'Daniel', roleLabel: '仕事用の高級腕時計を比較している', opening: 'I’m choosing between three watches. I care more about comfort and battery life than extra smart features.' },
+    bestRoute: ['装着感の優先度を確認する', '必要な電池持続時間を確認する', '差の大きい条件を比較する'], maxQuestions: 2,
+    questions: [
+      { id: 'd40w-comfort', text: 'Would you prefer the lightest watch even if it has fewer smart features?', response: 'Yes. Comfort matters more to me.', reveal: 'Comfort > smart features', value: 5 },
+      { id: 'd40w-battery', text: 'Do you need the battery to last more than three days?', response: 'Yes. I travel often, so at least four days would be better.', reveal: 'Battery ≥ 4 days', value: 5 },
+      { id: 'd40w-box', text: 'Do you want a wooden presentation box?', response: 'That is not important.', reveal: 'Box not important', value: 1 },
+      { id: 'd40w-brand', text: 'Have you seen our brand advertisement?', response: 'Yes, once.', reveal: 'Saw ad', value: 0 },
+    ],
+    candidates: [
+      { id: 'd40w-a', name: 'Aster Slim', details: 'Lightest · 5-day battery · fewer smart features', correct: true },
+      { id: 'd40w-b', name: 'Aster Pro', details: 'Heavier · 2-day battery · most smart features' },
+      { id: 'd40w-c', name: 'Aster Classic', details: 'Medium weight · 3-day battery · premium box' },
+      { id: 'd40w-d', name: 'Aster Sport', details: 'Heavy · 6-day battery · rugged design' },
+    ],
+  },
+  {
+    id: 'd40-bag-comparison', kind: 'dialogue', title: 'Not as heavy as it looks', skill: 'Nuanced Comparison',
+    objective: 'not as ... as と差の程度を使い、見た目と実際の重量差を説明する。', grammar: ['not as ... as', 'far / slightly'],
+    customer: { id: 'mia', name: 'Mia', roleLabel: '2つの通勤バッグを比較している', opening: 'The larger bag looks much heavier. Is it really difficult to carry every day?' },
+    bestRoute: ['見た目と実測を分ける', '差の程度を説明する', '客の用途へ戻す'],
+    choices: [
+      { id: 'd40b-best', text: 'It is not as heavy as it looks. It is only slightly heavier than the smaller bag, but it holds far more.', response: 'That sounds like a useful trade-off.', quality: 'best', points: 100, explanation: 'not as ... as、slightly、far moreを使って差を具体的に説明しています。' },
+      { id: 'd40b-good', text: 'It is a little heavier, but it has more space.', response: 'Okay, that helps.', quality: 'good', points: 88, explanation: '十分自然ですが、比較の幅は少なめです。' },
+      { id: 'd40b-poor', text: 'It is more light than it looks and most bigger.', response: 'I’m not sure what that means.', quality: 'poor', points: 20, explanation: '比較表現が不自然です。' },
+    ],
+  },
+  {
+    id: 'd40-premium-queue', kind: 'rapid', title: 'Premium comparison desk', skill: 'Comparison Queue',
+    objective: '3人の客に、差の大きさを含めた比較説明を素早く返す。', grammar: ['far more', 'slightly', 'not as ... as'],
+    customer: { id: 'grace', name: 'Premium floor', roleLabel: '高価格商品の比較質問が続く', opening: 'Three customers want clear comparisons before they spend more.' },
+    bestRoute: ['比較軸を特定する', '差の程度を正確に表す', '高価格=常に優秀と決めつけない'],
+    scenarios: [
+      { id: 'd40q-1', customer: 'Guest 1', line: 'Is the premium pillow much softer than the standard one?', choices: [
+        { id: 'd40q1-best', text: 'It is slightly softer, but the biggest difference is that it keeps its shape far longer.', response: 'That difference matters to me.', quality: 'best', points: 100, explanation: '差の大きさを誇張せず、主要差を説明しています。' },
+        { id: 'd40q1-good', text: 'It is softer and lasts longer.', response: 'Okay.', quality: 'good', points: 85, explanation: '要点は伝わります。' },
+        { id: 'd40q1-poor', text: 'It is infinitely softer because it costs more.', response: 'That sounds exaggerated.', quality: 'poor', points: 10, explanation: '価格から性能差を誇張しています。' },
+      ]},
+      { id: 'd40q-2', customer: 'Guest 2', line: 'Is this cashmere scarf as warm as the thicker wool one?', choices: [
+        { id: 'd40q2-best', text: 'It is not quite as warm as the thicker wool scarf, but it is much lighter and softer.', response: 'That comparison helps.', quality: 'best', points: 100, explanation: 'not as ... as と別の長所を組み合わせています。' },
+        { id: 'd40q2-good', text: 'The wool scarf is warmer. The cashmere one is lighter.', response: 'I see.', quality: 'good', points: 88, explanation: '比較は正しいです。' },
+        { id: 'd40q2-poor', text: 'Cashmere is always warmer than everything.', response: 'Are you sure?', quality: 'poor', points: 10, explanation: '根拠のない絶対化です。' },
+      ]},
+      { id: 'd40q-3', customer: 'Guest 3', line: 'The premium suitcase is twice the price. Is it much stronger?', choices: [
+        { id: 'd40q3-best', text: 'It is more durable, but the difference is not as large as the price difference. Its main advantage is the lighter frame.', response: 'That is useful to know.', quality: 'best', points: 100, explanation: '価格差と性能差を分けて説明しています。' },
+        { id: 'd40q3-good', text: 'It is stronger and lighter.', response: 'Okay.', quality: 'good', points: 85, explanation: '事実は伝わりますが差の程度は不明です。' },
+        { id: 'd40q3-poor', text: 'It costs twice as much, so it must be twice as strong.', response: 'That does not sound reliable.', quality: 'poor', points: 10, explanation: '価格比を性能比へ直接変換しています。' },
+      ]},
+    ],
+  },
+  {
+    id: 'd41-sale-return', kind: 'dialogue', title: 'Sale items are not always final sale', skill: 'Partial Negation',
+    objective: 'not always / not necessarily / no longerを使い、変更された返品ルールを説明する。', grammar: ['not always', 'not necessarily', 'no longer'], grammarTargets: [{ key: 'LIMITED_FREQUENCY_STATE', role: 'target' }],
+    customer: { id: 'mia', name: 'Mia', roleLabel: 'セール品の返品可否を確認したい', opening: 'The receipt says “sale item.” Does that always mean I cannot return it?' },
+    bestRoute: ['alwaysを否定しすぎない', '条件を確認する', '例外を含めた規則を説明する'],
+    choices: [
+      { id: 'd41s-best', text: 'Not necessarily. Being on sale no longer automatically means an item can’t be returned. If the receipt doesn’t say “final sale,” we can check the standard return policy.', response: 'Great. Mine does not say “final sale.”', quality: 'best', points: 100, explanation: 'no longerで以前の規則が現在は適用されないことを示し、例外条件を正確に説明しています。' },
+      { id: 'd41s-good', text: 'Some sale items can be returned. Let me check your receipt.', response: 'Okay.', quality: 'good', points: 90, explanation: '実務上は十分です。' },
+      { id: 'd41s-poor', text: 'Sale items can always be returned.', response: 'Even final-sale items?', quality: 'poor', points: 15, explanation: '例外を無視した断定です。' },
+    ],
+  },
+  {
+    id: 'd41-warranty-policy', kind: 'information-hunt', title: 'What does the warranty allow?', skill: 'Policy Hunt',
+    objective: '保証条件を確認し、allow / prevent / enable の意味を業務判断へつなげる。', grammar: ['allow / prevent / enable', 'not necessarily'],
+    customer: { id: 'daniel', name: 'Daniel', roleLabel: '保証で修理できるか確認したい', opening: 'My watch stopped working after I dropped it. The warranty says it covers manufacturing defects, but I’m not sure whether that means I’m covered.' },
+    bestRoute: ['故障原因を確認する', '保証対象の条件を確認する', '保証外でも有償対応を提案する'], maxQuestions: 2,
+    questions: [
+      { id: 'd41w-cause', text: 'Did the watch stop working immediately after it was dropped?', response: 'Yes. It stopped right after the fall.', reveal: 'Failure followed accidental drop', value: 5 },
+      { id: 'd41w-policy', text: 'Does the warranty specifically include accidental damage?', response: 'No. It only mentions manufacturing defects.', reveal: 'Accidental damage not included', value: 5 },
+      { id: 'd41w-box', text: 'Do you still have the original box?', response: 'Yes.', reveal: 'Original box available', value: 1 },
+      { id: 'd41w-color', text: 'What color is the watch?', response: 'Black.', reveal: 'Black watch', value: 0 },
+    ],
+    candidates: [
+      { id: 'd41w-a', name: 'Paid repair assessment', details: 'Warranty does not cover accidental drop', correct: true },
+      { id: 'd41w-b', name: 'Free warranty replacement', details: 'Only for manufacturing defect' },
+      { id: 'd41w-c', name: 'Refund because box is available', details: 'Box does not determine warranty' },
+      { id: 'd41w-d', name: 'No service is possible', details: 'Paid repair can still be offered' },
+    ],
+  },
+  {
+    id: 'd41-policy-handoff', kind: 'staff-coordination', title: 'Policy exception request', skill: 'Policy Handoff',
+    objective: '例外判断に必要な情報だけをManagerへ渡し、感情的な情報と事実を分ける。', grammar: ['allow / prevent', 'reported speech'],
+    customer: { id: 'grace', name: 'Grace', roleLabel: '通常期限外だが未使用ギフトの交換を相談している', opening: 'This was a gift, so I did not receive it until after the return period. It is unopened, I have the gift receipt, and I only want to exchange it for a different color.' },
+    bestRoute: ['期限外を選ぶ', '未開封・gift receiptを選ぶ', '返金ではなく色交換希望を伝える'], maxFacts: 3,
+    factsHeading: 'Customer → Staff · Key facts', notesHeading: 'STAFF NOTES', handoffHeading: 'Staff → Manager', handoffTargetLabel: 'MANAGER',
+    facts: [
+      { id: 'd41h-deadline', text: 'Outside the normal return period', essential: true },
+      { id: 'd41h-unopened', text: 'Unopened + gift receipt', essential: true },
+      { id: 'd41h-exchange', text: 'Color exchange only', essential: true },
+      { id: 'd41h-gift', text: 'The item was a gift', essential: false },
+      { id: 'd41h-bag', text: 'Customer brought a paper shopping bag', essential: false },
+      { id: 'd41h-weather', text: 'It is sunny outside', essential: false },
+    ],
+    handoffOptions: [
+      { id: 'd41hh-best', text: 'Can we make an exception for a color exchange?', reviewText: 'She’s outside the normal return period, but the item is unopened, she has the gift receipt, and she only wants to exchange it for another color. Could you see whether we can make an exception?', response: 'Yes. I can review this as an exception request.', quality: 'best', points: 30, explanation: '選択した事実を前提に、Managerへ必要な判断だけを明確に依頼しています。' },
+      { id: 'd41hh-good', text: 'Can we exchange it for another color?', reviewText: 'She received it as a gift and wants another color, but I haven’t included the return-policy details.', response: 'Do we know whether it is opened or whether she has a receipt?', quality: 'good', points: 18, explanation: '希望は明確ですが、例外判断であることをManagerへ示せていません。' },
+      { id: 'd41hh-poor', text: 'Can you handle this customer?', reviewText: 'A customer has a gift issue, but I haven’t clearly explained what she wants or why an exception may be needed.', response: 'What exactly is she asking us to do?', quality: 'poor', points: 5, explanation: '依頼内容が曖昧で、Managerが何を判断すべきか分かりません。' },
+    ],
+  },
+  {
+    id: 'd42-vip-incident', kind: 'incident-investigation', title: 'The reserved item dispute', skill: 'Manager Investigation',
+    objective: 'VIP客と通常客の双方の記録を確認し、誰かを優遇せず公平な結論を出す。', grammar: ['counterfactual review', 'policy language'],
+    customer: { id: 'daniel', name: 'Daniel', roleLabel: '予約商品が別の客へ渡された', opening: 'I reserved the limited fountain pen this morning and received a confirmation, but now I’m being told it was sold to someone else.' },
+    bestRoute: ['予約確定記録を確認する', '販売時のスタッフ判断を確認する', '手続き違反を事実で特定する'], maxInterviews: 2,
+    witnesses: [
+      { id: 'd42i-reserve', name: 'Reservation Desk', role: 'Customer service', statement: 'At 10:05, I confirmed one pen for Daniel and marked it “hold until 6 p.m.” in the system.', evidence: '10:05 · Confirmed hold until 6 p.m.', value: 5 },
+      { id: 'd42i-sales', name: 'Sales Associate', role: 'Luxury stationery', statement: 'At 3:40, a VIP customer asked for the pen. I saw the hold note, but I assumed the VIP request had priority and completed the sale.', evidence: '3:40 · Hold note seen but ignored', value: 5 },
+      { id: 'd42i-security', name: 'Security', role: 'Floor security', statement: 'There was no disturbance at the counter.', evidence: 'No security incident', value: 0 },
+      { id: 'd42i-stock', name: 'Stock Clerk', role: 'Back room', statement: 'Only one pen was in stock today.', evidence: 'Only one unit in stock', value: 1 },
+    ],
+    conclusions: [
+      { id: 'd42i-best', text: 'The store should have honored the confirmed hold. If the sales associate had followed the reservation note, the reserved pen would not have been sold to another customer.', correct: true, explanation: '確定holdを無視したことが直接原因で、VIPかどうかはルールを変更する根拠になっていません。' },
+      { id: 'd42i-wrong1', text: 'VIP customers should always receive reserved items first.', correct: false, explanation: '予約確定記録を無視する根拠になりません。' },
+      { id: 'd42i-wrong2', text: 'Security should have prevented the sale.', correct: false, explanation: 'セキュリティ問題ではありません。' },
+    ],
+  },
+  {
+    id: 'd42-manager-handoff', kind: 'staff-coordination', title: 'Escalate the complaint', skill: 'Manager Handoff',
+    objective: '高額商品のクレームをManagerへ、感情ではなく判断材料で引き継ぐ。', grammar: ['reported speech', 'policy / counterfactual'],
+    customer: { id: 'mia', name: 'Mia', roleLabel: '修理後も同じ不具合が再発した', opening: 'My premium headphones were repaired here last week, but the same problem came back today. I have the repair receipt, and I need them for a flight tonight.' },
+    bestRoute: ['同一不具合の再発を選ぶ', '修理記録ありを選ぶ', '今夜必要という時間制約を選ぶ'], maxFacts: 3,
+    facts: [
+      { id: 'd42h-repeat', text: 'The same fault returned one week after store repair', essential: true },
+      { id: 'd42h-receipt', text: 'Customer has the repair receipt', essential: true },
+      { id: 'd42h-flight', text: 'Customer needs the headphones for a flight tonight', essential: true },
+      { id: 'd42h-premium', text: 'The headphones are a premium model', essential: false },
+      { id: 'd42h-shirt', text: 'Customer is wearing a blue shirt', essential: false },
+      { id: 'd42h-case', text: 'The carrying case is black', essential: false },
+    ],
+    handoffOptions: [
+      { id: 'd42hh-best', text: 'The same fault returned one week after our repair. She has the repair receipt and needs the headphones for a flight tonight. Could you review whether we should prioritize a replacement or another repair?', response: 'Yes. I’ll review the repair record and available options now.', quality: 'best', points: 30, explanation: '再発、証拠、時間制約という判断材料を優先しています。' },
+      { id: 'd42hh-good', text: 'Her premium headphones have a problem again and she is flying tonight.', response: 'Do we have the previous repair record?', quality: 'good', points: 18, explanation: '概要は伝わりますが、修理レシート情報が抜けています。' },
+      { id: 'd42hh-poor', text: 'A customer is upset about her headphones.', response: 'What happened to them?', quality: 'poor', points: 5, explanation: 'Managerが判断できる情報が不足しています。' },
+    ],
+  },
+  {
+    id: 'd42-manager-queue', kind: 'rapid', title: 'Three difficult customers', skill: 'Manager Queue',
+    objective: 'Chapter 7の表現を使い、3人の難しい客へ公平で実行可能な返答をする。', grammar: ['subjunctive', 'wish', 'partial negation', 'comparison'],
+    customer: { id: 'grace', name: 'Manager desk', roleLabel: '閉店前に3件の難しい相談が続く', opening: 'Three difficult cases arrive while the manager is already handling another complaint.' },
+    bestRoute: ['断定しすぎない', '条件と例外を区別する', '現実的な代替案を必ず示す'],
+    scenarios: [
+      { id: 'd42q-1', customer: 'Guest 1', line: 'I wish I had bought the extended warranty. Can I add it now after the product has already broken?', choices: [
+        { id: 'd42q1-best', text: 'I understand the regret, but adding the warranty now would not cover damage that already happened. I can still check our paid repair options.', response: 'Okay. Please show me the repair options.', quality: 'best', points: 100, explanation: '過去の後悔を受け止めつつ、現在可能な対応を明確にしています。' },
+        { id: 'd42q1-good', text: 'The warranty cannot cover damage that already happened.', response: 'What can I do now?', quality: 'good', points: 80, explanation: '規則は正しいですが代案がありません。' },
+        { id: 'd42q1-poor', text: 'If you buy it now, it will cover yesterday’s damage.', response: 'Really?', quality: 'poor', points: 5, explanation: '事後加入で既発生の損害を補償するという誤案内です。' },
+      ]},
+      { id: 'd42q-2', customer: 'Guest 2', line: 'This bag costs far more than that one. Is it automatically better?', choices: [
+        { id: 'd42q2-best', text: 'Not necessarily. It uses more expensive leather, but the less expensive bag may fit your needs just as well.', response: 'That is a fair answer.', quality: 'best', points: 100, explanation: '価格と適合性を分け、not necessarilyを正しく使っています。' },
+        { id: 'd42q2-good', text: 'The expensive one uses better leather.', response: 'But do I need that?', quality: 'good', points: 78, explanation: '一部の差しか説明できていません。' },
+        { id: 'd42q2-poor', text: 'More expensive always means better.', response: 'I’m not sure that is true.', quality: 'poor', points: 10, explanation: '常に成り立つと断定しています。' },
+      ]},
+      { id: 'd42q-3', customer: 'Guest 3', line: 'If you had more staff tonight, could someone deliver this purchase to my hotel immediately?', choices: [
+        { id: 'd42q3-best', text: 'If we had an available delivery team tonight, we could arrange that. We don’t, but I can schedule the first delivery tomorrow morning.', response: 'Tomorrow morning will work.', quality: 'best', points: 100, explanation: '非現実条件と現在可能な代案を明確に分けています。' },
+        { id: 'd42q3-good', text: 'We cannot deliver tonight, but tomorrow morning is available.', response: 'Okay.', quality: 'good', points: 90, explanation: '業務上は良い対応です。' },
+        { id: 'd42q3-poor', text: 'If we had more staff, we deliver it now.', response: 'But you do not have more staff.', quality: 'poor', points: 25, explanation: '非現実条件の時制が不自然です。' },
+      ]},
+    ],
+  },
+]
+
+export function chapter7ActivityById(id: string) {
+  return chapter7Activities.find((activity) => activity.id === id)
+}

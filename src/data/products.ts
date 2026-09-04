@@ -1,0 +1,21 @@
+import type { Product } from '../core/types.js'
+
+export const products: Product[] = [
+  { id: 'rush-buds', category: 'earphones', name: 'Rush Buds', price: 5980, description: '軽量・低価格。普段使い向け。', features: { priceValue: .95, waterResistance: .2, lightWeight: .85, soundQuality: .6, simpleControls: .75, callQuality: .6, durability: .5, batteryLife: .6 } },
+  { id: 'trail-buds', category: 'earphones', name: 'Trail Buds', price: 8480, description: '防滴性能と軽さを重視したスポーツモデル。', features: { priceValue: .82, waterResistance: 1, lightWeight: .9, soundQuality: .7, simpleControls: .75, callQuality: .7, durability: .85, batteryLife: .75 } },
+  { id: 'studio-pro', category: 'earphones', name: 'Studio Pro', price: 14800, description: '音質最優先。やや重く、防滴は弱め。', features: { priceValue: .5, waterResistance: .2, lightWeight: .5, soundQuality: 1, simpleControls: .55, callQuality: .75, durability: .75, batteryLife: .72 } },
+  { id: 'easycall-buds', category: 'earphones', name: 'EasyCall Buds', price: 10800, description: '大きめの操作部と高品質マイク。', features: { priceValue: .68, waterResistance: .4, lightWeight: .75, soundQuality: .65, simpleControls: 1, callQuality: .98, durability: .7, batteryLife: .72 } },
+  { id: 'battery-beats', category: 'earphones', name: 'Battery Beats', price: 12800, description: '長時間バッテリー。旅行・長距離移動向け。', features: { priceValue: .58, waterResistance: .7, lightWeight: .65, soundQuality: .78, simpleControls: .65, callQuality: .7, durability: .8, batteryLife: 1 } },
+
+  { id: 'schoolbook-air', category: 'laptop', name: 'SchoolBook Air', price: 74800, description: '軽量・長時間駆動で学校向け。', features: { priceValue: .82, lightWeight: .96, simpleControls: .9, batteryLife: .95, performance: .62, durability: .7, screenQuality: .7, portability: .98 } },
+  { id: 'powerbook-15', category: 'laptop', name: 'PowerBook 15', price: 79800, description: '性能重視の15インチ標準モデル。', features: { priceValue: .74, lightWeight: .4, simpleControls: .55, batteryLife: .7, performance: .9, durability: .8, screenQuality: .82, portability: .42 } },
+  { id: 'creator-max', category: 'laptop', name: 'Creator Max', price: 118000, description: '動画編集向けの高性能・高画質モデル。', features: { priceValue: .42, lightWeight: .3, simpleControls: .45, batteryLife: .65, performance: 1, durability: .85, screenQuality: 1, portability: .35 } },
+  { id: 'budget-note', category: 'laptop', name: 'Budget Note', price: 54800, description: '価格を抑えたシンプルな学習・事務向けモデル。', features: { priceValue: 1, lightWeight: .7, simpleControls: .82, batteryLife: .65, performance: .5, durability: .55, screenQuality: .6, portability: .72 } },
+  { id: 'rugged-mate', category: 'laptop', name: 'Rugged Mate', price: 89800, description: '耐久性とバッテリーを重視した堅牢モデル。', features: { priceValue: .6, lightWeight: .45, simpleControls: .7, batteryLife: .9, performance: .7, durability: 1, screenQuality: .65, portability: .5 } },
+
+  { id: 'easy-watch', category: 'smartwatch', name: 'Easy Watch', price: 19800, description: '操作が分かりやすい入門モデル。', features: { priceValue: .9, simpleControls: 1, healthTracking: .7, batteryLife: .75, waterResistance: .8, lightWeight: .8, durability: .68, screenQuality: .65 } },
+  { id: 'run-track', category: 'smartwatch', name: 'Run Track', price: 24800, description: 'ランニング・防水・健康計測に強い。', features: { priceValue: .75, simpleControls: .7, healthTracking: .96, batteryLife: .8, waterResistance: 1, lightWeight: .9, durability: .82, screenQuality: .75 } },
+  { id: 'pro-health', category: 'smartwatch', name: 'Pro Health', price: 36800, description: '健康計測と高精細画面を重視。', features: { priceValue: .48, simpleControls: .55, healthTracking: 1, batteryLife: .65, waterResistance: .9, lightWeight: .68, durability: .8, screenQuality: .95 } },
+  { id: 'battery-watch', category: 'smartwatch', name: 'Battery Watch', price: 28800, description: '長時間バッテリーと堅牢性を重視。', features: { priceValue: .62, simpleControls: .75, healthTracking: .75, batteryLife: 1, waterResistance: .85, lightWeight: .65, durability: .9, screenQuality: .68 } },
+  { id: 'style-watch', category: 'smartwatch', name: 'Style Watch', price: 32800, description: '画面とデザインを重視した日常向け。', features: { priceValue: .54, simpleControls: .65, healthTracking: .65, batteryLife: .6, waterResistance: .7, lightWeight: .8, durability: .7, screenQuality: 1 } },
+]

@@ -1,0 +1,323 @@
+import { useState } from 'react'
+import { isDayUnlocked } from '../runtimeMode'
+import { ChapterActivityPlayer } from '../components/ChapterActivityPlayer'
+import { gradeFromPercent } from '../core/chapter1'
+import { chapter8ActivityById, chapter8Days } from '../data/chapter8'
+
+const STORAGE_KEY = 'english-shift-chapter8-progress-v1'
+
+type ChapterProgress = {
+  completedDays: number[]
+  bestScores: Record<string, number>
+  lastHintCounts: Record<string, number>
+  bestHintCounts: Record<string, number>
+}
+
+function readProgress(): ChapterProgress {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return { completedDays: [], bestScores: {}, lastHintCounts: {}, bestHintCounts: {} }
+    const parsed = JSON.parse(raw) as ChapterProgress
+    return {
+      completedDays: Array.isArray(parsed.completedDays) ? parsed.completedDays : [],
+      bestScores: parsed.bestScores ?? {},
+      lastHintCounts: parsed.lastHintCounts ?? {},
+      bestHintCounts: parsed.bestHintCounts ?? {},
+    }
+  } catch {
+    return { completedDays: [], bestScores: {}, lastHintCounts: {}, bestHintCounts: {} }
+  }
+}
+
+function saveProgress(progress: ChapterProgress) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress))
+}
+
+function scrollTop() {
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }))
+}
+
+
+type Level1ChapterSummary = {
+  chapter: number
+  completed: number
+  average: number | null
+}
+
+type Level1SummaryData = {
+  completedDays: number
+  completedChapters: number
+  average: number | null
+  hintFreeDays: number
+  chapters: Level1ChapterSummary[]
+}
+
+function readLevel1Summary(): Level1SummaryData {
+  const chapters: Level1ChapterSummary[] = []
+  let completedDays = 0
+  let completedChapters = 0
+  let scoreSum = 0
+  let scoreCount = 0
+  let hintFreeDays = 0
+
+  for (let chapter = 1; chapter <= 8; chapter += 1) {
+    const firstDay = (chapter - 1) * 6 + 1
+    const expectedDays = Array.from({ length: 6 }, (_, index) => firstDay + index)
+    try {
+      const raw = localStorage.getItem(`english-shift-chapter${chapter}-progress-v1`)
+      const parsed = raw ? JSON.parse(raw) as ChapterProgress : { completedDays: [], bestScores: {}, lastHintCounts: {}, bestHintCounts: {} }
+      const chapterCompleted = expectedDays.filter((day) => parsed.completedDays?.includes(day))
+      const chapterScores = chapterCompleted
+        .map((day) => parsed.bestScores?.[String(day)])
+        .filter((score): score is number => typeof score === 'number')
+      completedDays += chapterCompleted.length
+      if (chapterCompleted.length === 6) completedChapters += 1
+      chapterScores.forEach((score) => { scoreSum += score; scoreCount += 1 })
+      chapterCompleted.forEach((day) => {
+        if (parsed.bestHintCounts?.[String(day)] === 0) hintFreeDays += 1
+      })
+      chapters.push({
+        chapter,
+        completed: chapterCompleted.length,
+        average: chapterScores.length ? Math.round(chapterScores.reduce((sum, score) => sum + score, 0) / chapterScores.length) : null,
+      })
+    } catch {
+      chapters.push({ chapter, completed: 0, average: null })
+    }
+  }
+
+  return {
+    completedDays,
+    completedChapters,
+    average: scoreCount ? Math.round(scoreSum / scoreCount) : null,
+    hintFreeDays,
+    chapters,
+  }
+}
+
+function Level1Summary() {
+  const summary = readLevel1Summary()
+  const complete = summary.completedDays === 48
+  return (
+    <section className="level1-final-summary">
+      <div className="eyebrow">{complete ? 'LEVEL 1 COMPLETE' : 'LEVEL 1 PROGRESS SUMMARY'}</div>
+      <h2>{complete ? '48 Shifts Complete' : `${summary.completedDays} / 48 Shifts Complete`}</h2>
+      <p>{complete
+        ? '8つの店舗を通して、英語を読んで情報を集め、比較し、判断し、引き継ぐLevel 1を一周しました。'
+        : 'Final Chapterは完了しました。未プレイのShiftはChapterメニューからいつでも戻って実行できます。'}</p>
+      <div className="level1-summary-grid">
+        <div><span>Shifts</span><strong>{summary.completedDays}/48</strong></div>
+        <div><span>Chapters</span><strong>{summary.completedChapters}/8</strong></div>
+        <div><span>Best-score avg.</span><strong>{summary.average == null ? '—' : `${summary.average}%`}</strong></div>
+        <div><span>Hint-free shifts</span><strong>{summary.hintFreeDays}</strong></div>
+      </div>
+      <div className="level1-chapter-summary-list">
+        {summary.chapters.map((chapter) => (
+          <div key={chapter.chapter}>
+            <span>Chapter {chapter.chapter}</span>
+            <strong>{chapter.completed}/6{chapter.average == null ? '' : ` · ${chapter.average}%`}</strong>
+          </div>
+        ))}
+      </div>
+      <div className="level1-next-note">
+        <strong>{complete ? 'NEXT · LEVEL 2' : 'NEXT · COMPLETE THE REMAINING SHIFTS'}</strong>
+        <span>{complete
+          ? 'Level 2では同じ学習範囲を、選択式からBUILD形式へ段階的に変えて再利用できます。'
+          : '全Chapterは自由に選べるため、未完了の範囲だけ後から埋められます。'}</span>
+      </div>
+    </section>
+  )
+}
+
+function ChapterMap({ progress, onSelectDay, onReset }: { progress: ChapterProgress; onSelectDay: (day: number) => void; onReset: () => void }) {
+  const unlockedDay = Math.min(48, Math.max(43, 43 + progress.completedDays.length))
+  const chapterComplete = progress.completedDays.includes(48)
+
+  return (
+    <main className="chapter-map chapter-eight">
+      <section className="chapter-hero">
+        <div>
+          <div className="eyebrow">LEVEL 1 · CHAPTER 8</div>
+          <h2>International Flagship</h2>
+          <p>Day 43〜48では、これまでの英語・判断・Visual Grammarを国際旗艦店の複合接客で統合します。</p>
+          <p className="chapter-free-access-note">前のChapterを未完了でも、このChapterから自由に始められます。DayはChapter内で順番に解禁されます。</p>
+        </div>
+        <div className="chapter-progress-ring"><strong>{progress.completedDays.length}</strong><span>/ 6 shifts</span></div>
+      </section>
+
+      <div className="chapter-day-grid">
+        {chapter8Days.map((day) => {
+          const completed = progress.completedDays.includes(day.day)
+          const unlocked = isDayUnlocked(completed || day.day <= unlockedDay)
+          const best = progress.bestScores[String(day.day)]
+          return (
+            <button key={day.day} className={`chapter-day-card ${completed ? 'completed' : ''}`} disabled={!unlocked} onClick={() => onSelectDay(day.day)}>
+              <div className="chapter-day-number">DAY {day.day}</div>
+              <h3>{day.title}</h3>
+              <p>{day.subtitle}</p>
+              <div className="chapter-day-meta"><span>{day.gameFocus}</span><strong>{completed ? `✓ ${best ?? 0}%` : unlocked ? 'PLAY' : 'LOCKED'}</strong></div>
+            </button>
+          )
+        })}
+      </div>
+
+      {chapterComplete && (
+        <section className="chapter-clear-card">
+          <div className="eyebrow">CHAPTER CLEAR</div>
+          <h2>International Flagship Complete</h2>
+          <p>複合説明、Staff Briefing、Investigation、VIP対応、All-Store Gauntlet、Final Shiftまで完了しました。</p>
+        </section>
+      )}
+
+      {chapterComplete && <Level1Summary />}
+
+      <details className="chapter-reset-details">
+        <summary>Progress options</summary>
+        <button className="secondary-button" onClick={onReset}>Reset Chapter 8 progress</button>
+      </details>
+    </main>
+  )
+}
+
+function DayIntro({ dayNumber, onStart, onBack }: { dayNumber: number; onStart: () => void; onBack: () => void }) {
+  const day = chapter8Days.find((item) => item.day === dayNumber)!
+  return (
+    <main className="chapter-day-intro">
+      <button className="chapter-back" onClick={onBack}>← Chapter map</button>
+      <div className="eyebrow">CHAPTER 8 · DAY {day.day}</div>
+      <h2>{day.title}</h2>
+      <p className="chapter-day-subtitle">{day.subtitle}</p>
+      <div className="chapter-plan-grid">
+        <div><span>Game focus</span><strong>{day.gameFocus}</strong></div>
+        <div><span>Activities</span><strong>{day.activityIds.length}</strong></div>
+      </div>
+      <section className="chapter-language-card">
+        <div><strong>NEW</strong>{day.newLanguage.length ? day.newLanguage.map((item) => <span key={item}>{item}</span>) : <span>新規なし・総復習</span>}</div>
+        <div><strong>REVIEW</strong>{day.reviewLanguage.length ? day.reviewLanguage.map((item) => <span key={item}>{item}</span>) : <span>—</span>}</div>
+      </section>
+      <section className="chapter-can-do"><div className="eyebrow">TODAY'S CAN-DO</div>{day.canDo.map((item) => <p key={item}>✓ {item}</p>)}</section>
+      <button className="primary chapter-start" onClick={onStart}>Start Day {day.day}</button>
+    </main>
+  )
+}
+
+function DayResult({ dayNumber, scores, hintCounts, onFinish }: { dayNumber: number; scores: number[]; hintCounts: number[]; onFinish: (percent: number, hintsUsed: number) => void }) {
+  const day = chapter8Days.find((item) => item.day === dayNumber)!
+  const total = scores.reduce((sum, value) => sum + value, 0)
+  const max = day.activityIds.length * 100
+  const percent = max ? Math.round((total / max) * 100) : 0
+  const grade = gradeFromPercent(percent)
+  const hintsUsed = hintCounts.reduce((sum, value) => sum + value, 0)
+
+  return (
+    <main className="chapter-day-result">
+      <div className="eyebrow">SHIFT COMPLETE · DAY {day.day}</div>
+      <div className="chapter-result-head">
+        <div><h2>{day.title} Complete</h2><p>{day.subtitle}</p></div>
+        <div className={`grade-badge grade-${grade.toLowerCase()}`}>{grade}</div>
+      </div>
+      <div className="chapter-day-score-grid">
+        <div><span>Score</span><strong>{percent}%</strong></div>
+        <div><span>Activities</span><strong>{scores.length}/{day.activityIds.length}</strong></div>
+        <div><span>Best activity</span><strong>{Math.max(...scores)}%</strong></div>
+        <div><span>Japanese hints</span><strong>{hintsUsed}</strong></div>
+      </div>
+      <div className="chapter-hint-note">日本語ヒントは減点されません。少ないほど、自力で読めた英文が増えた目安になります。</div>
+      <section className="chapter-can-do result-can-do">
+        <div className="eyebrow">YOU PRACTICED</div>
+        {day.canDo.map((item) => <p key={item}>✓ {item}</p>)}
+      </section>
+      <div className="chapter-activity-score-list">
+        {scores.map((score, index) => <div key={index}><span>Activity {index + 1}</span><strong>{score}/100</strong></div>)}
+      </div>
+      <button className="primary chapter-start" onClick={() => onFinish(percent, hintsUsed)}>{day.day === 48 ? 'Complete Level 1 Final Chapter' : 'Finish Day'}</button>
+    </main>
+  )
+}
+
+export function Chapter8Screen() {
+  const [progress, setProgress] = useState<ChapterProgress>(() => readProgress())
+  const [selectedDay, setSelectedDay] = useState<number | null>(null)
+  const [started, setStarted] = useState(false)
+  const [activityIndex, setActivityIndex] = useState(0)
+  const [scores, setScores] = useState<number[]>([])
+  const [hintCounts, setHintCounts] = useState<number[]>([])
+  const day = selectedDay ? chapter8Days.find((item) => item.day === selectedDay) : undefined
+  const activity = day ? chapter8ActivityById(day.activityIds[activityIndex]) : undefined
+  const dayDone = Boolean(day && started && activityIndex >= day.activityIds.length)
+
+
+  const selectDay = (dayNumber: number) => {
+    setSelectedDay(dayNumber)
+    setStarted(false)
+    setActivityIndex(0)
+    setScores([])
+    setHintCounts([])
+    scrollTop()
+  }
+
+  const startDay = () => {
+    setStarted(true)
+    setActivityIndex(0)
+    setScores([])
+    setHintCounts([])
+    scrollTop()
+  }
+
+  const completeActivity = (score: number, hintsUsed: number) => {
+    setScores((current) => [...current, score])
+    setHintCounts((current) => [...current, hintsUsed])
+    setActivityIndex((current) => current + 1)
+    scrollTop()
+  }
+
+  const finishDay = (percent: number, hintsUsed: number) => {
+    if (!selectedDay) return
+    const completedDays = [...new Set([...progress.completedDays, selectedDay])].sort((a, b) => a - b)
+    const currentBest = progress.bestScores[String(selectedDay)] ?? 0
+    const previousBestHints = progress.bestHintCounts[String(selectedDay)]
+    const nextProgress = {
+      completedDays,
+      bestScores: { ...progress.bestScores, [String(selectedDay)]: Math.max(currentBest, percent) },
+      lastHintCounts: { ...progress.lastHintCounts, [String(selectedDay)]: hintsUsed },
+      bestHintCounts: {
+        ...progress.bestHintCounts,
+        [String(selectedDay)]: previousBestHints == null ? hintsUsed : Math.min(previousBestHints, hintsUsed),
+      },
+    }
+    setProgress(nextProgress)
+    saveProgress(nextProgress)
+    setSelectedDay(null)
+    setStarted(false)
+    setActivityIndex(0)
+    setScores([])
+    setHintCounts([])
+    scrollTop()
+  }
+
+  const reset = () => {
+    const empty = { completedDays: [], bestScores: {}, lastHintCounts: {}, bestHintCounts: {} }
+    setProgress(empty)
+    saveProgress(empty)
+    setSelectedDay(null)
+    setStarted(false)
+    scrollTop()
+  }
+
+  if (!selectedDay) return <ChapterMap progress={progress} onSelectDay={selectDay} onReset={reset} />
+  if (!started) return <DayIntro dayNumber={selectedDay} onStart={startDay} onBack={() => { setSelectedDay(null); scrollTop() }} />
+  if (dayDone) return <DayResult dayNumber={selectedDay} scores={scores} hintCounts={hintCounts} onFinish={finishDay} />
+  if (!activity || !day) return <main className="chapter-day-result"><h2>Activity data not found.</h2></main>
+
+  return (
+    <main className="chapter-play">
+      <div className="chapter-play-header">
+        <div><div className="eyebrow">DAY {day.day} · ACTIVITY {activityIndex + 1}/{day.activityIds.length}</div><h2>{activity.title}</h2></div>
+        <div className="chapter-mini-score"><span>Day score</span><strong>{scores.reduce((sum, value) => sum + value, 0)}</strong></div>
+      </div>
+      <div className="chapter-progress-track"><span style={{ width: `${(activityIndex / day.activityIds.length) * 100}%` }} /></div>
+      <ChapterActivityPlayer key={activity.id} activity={activity} onComplete={completeActivity} />
+    </main>
+  )
+}

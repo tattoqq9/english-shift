@@ -1,0 +1,63 @@
+import { diagnoseBuild, assembleBuildSentence } from '../src/core/build.js'
+import { level2BuildActivities } from '../src/data/level2BuildActivities.js'
+
+function assert(condition: unknown, message: string): asserts condition {
+  if (!condition) throw new Error(message)
+}
+
+const suspicious = [
+  /\b(could|would|should|must|can|may|might|will) to\b/i,
+  /\bif not of\b/i,
+  /\bnot longer\b/i,
+  /\bfor to\b/i,
+  /\bthe (?:the|a|an)\b/i,
+]
+
+let longestSentence = 0
+let longestChunk = 0
+let almostChecks = 0
+let notQuiteChecks = 0
+
+for (const activity of level2BuildActivities) {
+  const targetChunks = activity.targetChunkIds.map((id) => activity.chunks.find((chunk) => chunk.id === id)!)
+  const distractors = activity.chunks.filter((chunk) => chunk.distractor)
+  const targetTexts = new Set(targetChunks.map((chunk) => chunk.text.toLowerCase()))
+  const distractorTexts = distractors.map((chunk) => chunk.text.toLowerCase())
+
+  assert(activity.hintsJa?.length === 3, `${activity.id}: expected exactly 3 progressive hints`)
+  assert(new Set(activity.hintsJa).size === 3, `${activity.id}: hints should be distinct`)
+  assert(!activity.hintsJa.some((hint) => hint.includes(activity.targetSentence)), `${activity.id}: a hint reveals the full answer`)
+  assert(activity.slotLabels?.length === activity.targetChunkIds.length, `${activity.id}: slot labels must match target chunk count`)
+  assert(distractors.length >= 2, `${activity.id}: needs at least two distractors`)
+  assert(new Set(distractorTexts).size === distractorTexts.length, `${activity.id}: duplicate distractor text`)
+
+  for (const chunk of targetChunks) {
+    const words = chunk.text.trim().split(/\s+/).filter(Boolean).length
+    longestChunk = Math.max(longestChunk, words)
+    assert(words <= 8, `${activity.id}: target chunk too long (${words} words): ${chunk.text}`)
+  }
+  for (const chunk of distractors) {
+    assert(!targetTexts.has(chunk.text.toLowerCase()), `${activity.id}: distractor duplicates target chunk: ${chunk.text}`)
+    for (const pattern of suspicious) assert(!pattern.test(chunk.text), `${activity.id}: low-quality distractor “${chunk.text}” matched ${pattern}`)
+  }
+
+  const sentenceWords = activity.targetSentence.trim().split(/\s+/).filter(Boolean).length
+  longestSentence = Math.max(longestSentence, sentenceWords)
+  assert(sentenceWords <= 30, `${activity.id}: model response is too long (${sentenceWords} words)`)
+  assert(assembleBuildSentence(activity, activity.targetChunkIds) === activity.targetSentence, `${activity.id}: target assembly mismatch`)
+
+  const swapped = [...activity.targetChunkIds]
+  ;[swapped[0], swapped[1]] = [swapped[1], swapped[0]]
+  const almost = diagnoseBuild(activity, swapped)
+  assert(almost.check === 'almost', `${activity.id}: correct chunks in wrong order should be Almost`)
+  assert(/[ぁ-んァ-ヶ一-龯]/.test(almost.feedback), `${activity.id}: Almost feedback should be Japanese`) 
+  almostChecks += 1
+
+  const distractorTrial = [activity.targetChunkIds[0], distractors[0].id]
+  const notQuite = diagnoseBuild(activity, distractorTrial)
+  assert(notQuite.check === 'not_quite', `${activity.id}: distractor use should be Not quite`)
+  assert(/[ぁ-んァ-ヶ一-龯]/.test(notQuite.feedback), `${activity.id}: Not quite feedback should be Japanese`)
+  notQuiteChecks += 1
+}
+
+console.log(`Level 2 quality audit PASS · activities=${level2BuildActivities.length} · progressive-hints=3/3 · longest-response=${longestSentence} words · longest-chunk=${longestChunk} words · almost=${almostChecks} · not-quite=${notQuiteChecks}`)
