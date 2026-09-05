@@ -15,7 +15,7 @@ export function LearnScreen({ onNavigate }: { onNavigate: (view: AppView) => voi
         <div>
           <div className="eyebrow">COURSE MAP</div>
           <h2>Learn</h2>
-          <p>学習モードをタブで横並びにせず、コース階層として整理しました。Level 1から順に進めても、必要な場所へ直接戻っても構いません。</p>
+          <p>Level 1で正しい英語を見分け、Level 2で自分で作る力へ進みます。必要に応じてExam ShiftとAdvanced Trainingで仕上げます。</p>
         </div>
         <div className="learn-progress-summary"><strong>{snapshot.level1Completed}</strong><span>/ 48 Level 1 Shifts</span></div>
       </section>
@@ -64,10 +64,9 @@ export function LearnScreen({ onNavigate }: { onNavigate: (view: AppView) => voi
         </button>
       </section>
 
-
       <section className="advanced-course-section">
         <div className="advanced-course-head">
-          <div><span>ADVANCED TRAINING</span><h3>Specialized Practice</h3><p>Level 2本編から分離した、診断力と会話設計の追加コースです。</p></div>
+          <div><span>ADVANCED TRAINING</span><h3>Specialized Practice</h3><p>REPAIRでは英文の修正力、FLOWでは会話全体の組み立てを追加練習できます。</p></div>
           <strong>{advancedUnlocked ? 'OPEN' : 'LEVEL 1 REQUIRED'}</strong>
         </div>
         <div className="advanced-course-grid">
@@ -78,9 +77,9 @@ export function LearnScreen({ onNavigate }: { onNavigate: (view: AppView) => voi
             <strong>{advancedUnlocked ? 'Open Repair Lab →' : 'Locked'}</strong>
           </button>
           <button className="advanced-course-card flow" disabled={!advancedUnlocked} onClick={() => onNavigate('flow')}>
-            <div><span>FLOW LAB</span><em>{advanced.flowCompleted.length}/{flowActivities.length}</em></div>
+            <div><span>FLOW LAB · OPTIONAL</span><em>{advanced.flowCompleted.length}/{flowActivities.length}</em></div>
             <h3>Build complete conversations</h3>
-            <p>謝罪・確認・提案などを、接客として自然な順番に組み立てます。</p>
+            <p>謝罪・確認・提案などを、接客として自然な順番に組み立てる追加トレーニングです。</p>
             <strong>{advancedUnlocked ? 'Open Flow Lab →' : 'Locked'}</strong>
           </button>
         </div>

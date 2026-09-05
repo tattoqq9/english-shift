@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from 'react'
 import type { BuildActivity, BuildMode, BuildPresentation } from '../core/build'
 import { assembleBuildSentence, scoreBuild } from '../core/build'
+import { canCheckChangedAnswer, canRevealBestAnswer } from '../core/learningInteraction'
 import { grammarRegistryByKey } from '../data/grammarRegistry'
 import { recordMasteryAttempt } from '../core/mastery'
 
@@ -35,13 +36,17 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   const [resolved, setResolved] = useState(false)
   const [revealed, setRevealed] = useState(false)
   const [lastCheckedSentence, setLastCheckedSentence] = useState<string | null>(null)
+  const [lastCheckedSignature, setLastCheckedSignature] = useState<string | null>(null)
   const [showOpeningJa, setShowOpeningJa] = useState(false)
   const recorded = useRef(false)
   const scene = SCENE[activity.chapter]
 
   const selectedSentence = useMemo(() => assembleBuildSentence(activity, selectedIds), [activity, selectedIds])
+  const currentSignature = selectedIds.join('|')
   const available = activity.chunks.filter((chunk) => !selectedIds.includes(chunk.id))
-  const finalScore = resolved ? scoreBuild(activity, selectedIds, Math.max(1, attempts), hintsUsed, revealed) : null
+  const canCheck = canCheckChangedAnswer(currentSignature, lastCheckedSignature)
+  const canReveal = canRevealBestAnswer(attempts, hintsUsed, 3)
+  const finalScore = resolved ? scoreBuild(activity, selectedIds, attempts, hintsUsed, revealed) : null
 
   const selectChunk = (id: string) => {
     if (resolved || selectedIds.length >= activity.targetChunkIds.length + 1) return
@@ -55,9 +60,10 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   }
 
   const checkSentence = () => {
-    if (!selectedIds.length || resolved) return
+    if (!canCheck || resolved) return
     const nextAttempts = attempts + 1
     setAttempts(nextAttempts)
+    setLastCheckedSignature(currentSignature)
     const result = scoreBuild(activity, selectedIds, nextAttempts, hintsUsed)
     setLastCheckedSentence(selectedSentence)
     setFeedback(result.feedback)
@@ -81,10 +87,11 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   }
 
   const revealAnswer = () => {
+    if (!canReveal || resolved) return
     if (selectedSentence) setLastCheckedSentence(selectedSentence)
     setSelectedIds(activity.targetChunkIds)
     setRevealed(true); setResolved(true); setCheckLabel(null)
-    const result = scoreBuild(activity, activity.targetChunkIds, Math.max(1, attempts), hintsUsed, true)
+    const result = scoreBuild(activity, activity.targetChunkIds, attempts, hintsUsed, true)
     setFeedback(result.feedback)
     if (!recorded.current) {
       recorded.current = true
@@ -110,7 +117,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
 
       {!resolved ? (
         <section className="build-workbench">
-          <div className="build-workbench-head"><div><span>ASSEMBLE YOUR RESPONSE</span><strong>{presentation === 'guided' ? '文の役割を見ながら組み立てる' : presentation === 'semi' ? 'スロットだけを手がかりに組み立てる' : '自力で自然な語順を作る'}</strong></div><span className="build-attempt-counter">Checks {attempts}</span></div>
+          <div className="build-workbench-head"><div><span>ASSEMBLE YOUR RESPONSE</span><strong>{presentation === 'guided' ? '文の役割を見ながら組み立てる' : presentation === 'semi' ? 'スロットだけを手がかりに組み立てる' : '自力で自然な語順を作る'}</strong></div></div>
 
           {presentation !== 'free' ? <div className={`build-slot-tray ${presentation}`}>
             {slots.map((id, index) => {
@@ -132,10 +139,21 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
           <div className="build-actions">
             <button className="secondary-button" onClick={() => { setSelectedIds([]); setFeedback(null); setCheckLabel(null) }} disabled={!selectedIds.length}>Clear</button>
             <button className="secondary-button" onClick={showHint} disabled={hintsUsed >= 3}>Hint {Math.min(hintsUsed + 1, 3)} / 3</button>
-            {(attempts >= 3 || hintsUsed >= 3) && <button className="secondary-button" onClick={revealAnswer}>Show best answer</button>}
-            <button className="primary" onClick={checkSentence} disabled={!selectedIds.length}>Check my sentence</button>
+            <button className="primary" onClick={checkSentence} disabled={!canCheck}>Check my sentence</button>
           </div>
-          {!selectedIds.length && <p className="build-check-helper">フレーズを選ぶとチェックできます。</p>}
+          {!selectedIds.length ? (
+            <p className="build-check-helper">フレーズを選ぶとチェックできます。最初から難しいときはHintを使えます。</p>
+          ) : !canCheck ? (
+            <p className="learning-support-note"><strong>同じ回答は再チェックしません。</strong> 回答を変えると再チェックできます。HintやBest answerで確認することもできます。</p>
+          ) : attempts > 0 ? (
+            <p className="learning-support-note">修正してもう一度試すか、Hint / Best answerで確認できます。</p>
+          ) : null}
+          {canReveal && (
+            <div className="learning-reveal-zone">
+              <span>答えを確認する</span>
+              <button className="secondary-button learning-reveal-action" onClick={revealAnswer}>See best answer</button>
+            </div>
+          )}
         </section>
       ) : finalScore ? (
         <section className="build-result-card">

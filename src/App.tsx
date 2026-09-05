@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TopBar } from './components/TopBar'
 import { Chapter1Screen } from './screens/Chapter1Screen'
 import { Chapter2Screen } from './screens/Chapter2Screen'
@@ -19,27 +19,10 @@ import { Level2BuildScreen } from './screens/Level2BuildScreen'
 import { RepairLabScreen } from './screens/RepairLabScreen'
 import { FlowLabScreen } from './screens/FlowLabScreen'
 import { completeOnboarding, shouldShowOnboarding } from './core/onboarding'
+import { makeAppHistoryState, readAppHistoryView, type HistoryAppView } from './core/appHistory'
 import { DEBUG_UNLOCK_ALL_DAYS } from './runtimeMode'
 
-export type AppView =
-  | 'home'
-  | 'learn'
-  | 'mastery'
-  | 'more'
-  | 'onboarding'
-  | 'chapter1'
-  | 'chapter2'
-  | 'chapter3'
-  | 'chapter4'
-  | 'chapter5'
-  | 'chapter6'
-  | 'chapter7'
-  | 'chapter8'
-  | 'exam'
-  | 'build'
-  | 'repair'
-  | 'flow'
-  | 'lab'
+export type AppView = HistoryAppView
 
 function initialView(): AppView {
   try {
@@ -49,21 +32,66 @@ function initialView(): AppView {
   }
 }
 
+function scrollTop(behavior: ScrollBehavior = 'smooth') {
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : behavior }))
+}
+
 export default function App() {
-  const [view, setView] = useState<AppView>(initialView)
+  const [view, setView] = useState<AppView>(() => initialView())
   const [onboardingReturnView, setOnboardingReturnView] = useState<AppView | null>(null)
 
-  const navigate = (next: AppView) => {
+  useEffect(() => {
+    const previousScrollRestoration = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+
+    try {
+      if (!readAppHistoryView(window.history.state)) {
+        window.history.replaceState(makeAppHistoryState(view), '')
+      }
+    } catch { /* History API can be restricted in embedded browsers. */ }
+
+    const handlePopState = (event: PopStateEvent) => {
+      const next = readAppHistoryView(event.state)
+      if (!next) return
+      setOnboardingReturnView(null)
+      setView(next)
+      scrollTop('auto')
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+      window.history.scrollRestoration = previousScrollRestoration
+    }
+    // The first rendered route owns the initial history entry. Subsequent
+    // navigation is written explicitly by navigate().
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const navigate = (next: AppView, options?: { replace?: boolean }) => {
     if (next === 'onboarding' && view !== 'onboarding') setOnboardingReturnView(view)
+
+    if (next === view && !options?.replace) {
+      scrollTop()
+      return
+    }
+
     setView(next)
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }))
+    try {
+      const state = makeAppHistoryState(next)
+      if (options?.replace) window.history.replaceState(state, '')
+      else window.history.pushState(state, '')
+    } catch { /* Navigation must continue even when History API is unavailable. */ }
+    scrollTop()
   }
 
   const finishOnboarding = (destination: AppView, reason: 'completed' | 'skipped') => {
     try { completeOnboarding(window.localStorage, reason) } catch { /* do not block navigation */ }
     setOnboardingReturnView(null)
-    navigate(destination)
+    // Replace the onboarding entry so Android/browser Back does not reopen a
+    // tutorial that the learner has just finished or skipped.
+    navigate(destination, { replace: true })
   }
 
   if (view === 'onboarding') {

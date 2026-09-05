@@ -37,7 +37,7 @@ export function HomeScreen({ onNavigate }: { onNavigate: (view: AppView) => void
         <div>
           <div className="eyebrow">ENGLISH SHIFT · LEARNING HOME</div>
           <h2>次にやることを、ひとつだけ。</h2>
-          <p>接客英語を遊びながら、選ぶ → 組み立てる → 試験英語へ。迷ったらここから続けられます。</p>
+          <p>英語を見分ける → 自分で作る → 間違いを直す。弱点はMasteryで見つけて、必要な力だけ復習できます。</p>
         </div>
         <div className="home-level-badge"><strong>{snapshot.level1Completed}</strong><span>/ 48 Shifts</span></div>
       </section>

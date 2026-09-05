@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.4.8",
+  "version": "0.4.9",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,16 +10,19 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js && node .core-build/scripts/onboarding-smoke.js",
+    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js && node .core-build/scripts/onboarding-smoke.js && node .core-build/scripts/release-ux-smoke.js && node .core-build/scripts/learning-interaction-smoke.js",
     "grammar:audit": "tsc -p tsconfig.core.json && node .core-build/scripts/grammar-audit.js",
     "mastery:check": "tsc -p tsconfig.core.json && node .core-build/scripts/mastery-smoke.js",
     "review:check": "tsc -p tsconfig.core.json && node .core-build/scripts/review-smoke.js",
     "onboarding:check": "tsc -p tsconfig.core.json && node .core-build/scripts/onboarding-smoke.js",
+    "release:check": "tsc -p tsconfig.core.json && node .core-build/scripts/release-ux-smoke.js && node .core-build/scripts/learning-interaction-smoke.js",
     "build:check": "tsc -p tsconfig.core.json && node .core-build/scripts/build-smoke.js",
     "nav:check": "tsc -p tsconfig.core.json && node .core-build/scripts/navigation-smoke.js",
     "advanced:check": "tsc -p tsconfig.core.json && node .core-build/scripts/advanced-smoke.js",
     "level2:audit": "tsc -p tsconfig.core.json && node .core-build/scripts/build-smoke.js",
-    "level2:quality": "tsc -p tsconfig.core.json && node .core-build/scripts/build-quality-audit.js"
+    "level2:quality": "tsc -p tsconfig.core.json && node .core-build/scripts/build-quality-audit.js",
+    "version:sync": "node scripts/sync-package-lock-version.mjs",
+    "interaction:check": "tsc -p tsconfig.core.json && node .core-build/scripts/learning-interaction-smoke.js"
   },
   "dependencies": {
     "react": "^19.2.7",

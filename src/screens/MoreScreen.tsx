@@ -14,7 +14,7 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
         <button className="more-card" onClick={() => onNavigate('onboarding')}>
           <span>GUIDE</span>
           <strong>Getting Started</strong>
-          <p>SELECT → BUILD → MASTERYの学習ループを、初回チュートリアルでもう一度確認できます。進捗は変更しません。</p>
+          <p>SELECT → BUILD → REPAIR / MASTERYの学習ループを、チュートリアルでもう一度確認できます。進捗は変更しません。</p>
           <em>View tutorial →</em>
         </button>
         <button className="more-card" onClick={() => onNavigate('lab')}>
@@ -28,6 +28,12 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <strong>ES Grammar System</strong>
           <p>Level 1でES-G1/G2、Exam ShiftでES-G3をカバー。Level 2は英文生成、Advanced TrainingはREPAIR / FLOWとして能力別に分離しています。</p>
           <em>G1 + G2 + G3</em>
+        </article>
+        <article className="more-card info">
+          <span>RELEASE</span>
+          <strong>v0.4.9 · Mobile Polish</strong>
+          <p>Androidの戻る操作、Safe Area、長文折り返し、主要ボタンのタップ領域をリリース向けに調整しています。</p>
+          <em>Release UX pass</em>
         </article>
         {DEBUG_UNLOCK_ALL_DAYS && (
           <article className="more-card debug">

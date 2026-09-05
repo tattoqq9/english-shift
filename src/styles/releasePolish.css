@@ -1,0 +1,250 @@
+/* v0.4.9 release-focused Android / mobile safeguards.
+   Kept in a separate override file so the large established stylesheet remains
+   stable during the release-candidate pass. */
+
+html,
+body,
+#root,
+.app-shell {
+  max-width: 100%;
+  min-width: 0;
+}
+
+html,
+body {
+  overflow-x: clip;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+/* Long English sentences and generated grammar labels must wrap rather than
+   expanding cards beyond the viewport. */
+.build-sentence-preview,
+.build-answer-review,
+.build-last-try-review,
+.build-response-review,
+.answer-review-answer,
+.scene-speech-bubble,
+.jp-reveal,
+.language-review-item,
+.mastery-concept-card,
+.mastery-skill-row,
+.home-path-card,
+.chapter-path-card,
+.more-card,
+.course-mode-card,
+.advanced-course-card {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.build-sentence-preview strong,
+.build-answer-review strong,
+.build-last-try-review strong,
+.answer-review-answer strong,
+.scene-speech-bubble,
+.jp-reveal {
+  white-space: normal;
+}
+
+/* Keep primary actions reliably tappable on Android without globally inflating
+   every compact chip and chunk button. */
+.primary,
+.secondary-button,
+.chapter-back,
+.chapter-continue,
+.chapter-submit,
+.home-continue-button,
+.jp-toggle,
+.brand-button,
+.detail-breadcrumb button,
+.primary-nav-mobile button,
+.more-card,
+.course-mode-card,
+.advanced-course-card {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+.primary-nav-mobile button,
+.home-continue-button,
+.chapter-continue,
+.chapter-submit {
+  min-height: 48px;
+}
+
+/* Results opened after a long activity should not land underneath the sticky
+   header on browsers that preserve a previous visual viewport offset. */
+.chapter-activity-result,
+.build-result-card,
+.advanced-result-card,
+.weakness-review-result {
+  scroll-margin-top: calc(76px + env(safe-area-inset-top));
+}
+
+/* Safe-area treatment for gesture navigation / display cutouts. */
+.topbar {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .primary-nav-mobile {
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+  }
+
+  .home-continue-card,
+  .course-section-head,
+  .advanced-course-head,
+  .mastery-hero,
+  .learn-hero,
+  .more-hero {
+    min-width: 0;
+  }
+
+  .home-continue-card {
+    align-items: stretch;
+  }
+
+  .home-continue-copy,
+  .home-continue-copy h3,
+  .home-continue-copy p {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .build-actions,
+  .chapter-feedback-columns,
+  .mastery-summary-grid,
+  .build-result-grid {
+    max-width: 100%;
+  }
+
+  .detail-breadcrumb {
+    min-width: 0;
+  }
+
+  .detail-breadcrumb > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 430px) {
+  .primary,
+  .secondary-button,
+  .chapter-back,
+  .chapter-continue,
+  .chapter-submit,
+  .home-continue-button {
+    min-height: 50px;
+  }
+
+  .home-quick-grid,
+  .course-mode-grid,
+  .advanced-course-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .build-actions > button {
+    flex: 1 1 140px;
+  }
+}
+
+@media (max-height: 620px) and (max-width: 760px) {
+  .app-shell {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+}
+
+/* v0.4.9 interaction UX ---------------------------------------------------
+   Choice cards visually read as one target, so the whole card should behave
+   as one target too. The translation toggle remains the only independent
+   control. The transparent ::after hit layer belongs to the English answer
+   button and extends across the card; the translation toggle sits above it. */
+.chapter-choice-with-help {
+  position: relative;
+}
+
+.chapter-choice-with-help > .chapter-answer-button:not(:disabled)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.chapter-choice-with-help > .jp-help.compact .jp-toggle {
+  position: relative;
+  z-index: 3;
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .chapter-choice-with-help:has(> .chapter-answer-button:not(:disabled)) {
+    cursor: pointer;
+  }
+}
+
+/* Keep answer reveal visually below the normal work controls. The learner
+   first retries or uses a Hint, then crosses a small divider into the
+   "confirm the answer" rescue path. This preserves forward visual flow
+   without styling reveal as the primary action. */
+.learning-reveal-zone {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(90, 99, 94, .18);
+}
+
+.learning-reveal-zone > span {
+  color: #7a807c;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-align: center;
+}
+
+.learning-reveal-action {
+  width: 100%;
+  min-height: 48px;
+  border-style: dashed;
+  background: #fbfaf5;
+}
+
+.learning-support-note {
+  margin: 8px 0 0;
+  color: #6b716d;
+  font-size: .82rem;
+  line-height: 1.5;
+}
+
+.learning-support-note strong {
+  color: #435b58;
+}
+
+/* Let pointer taps on translation whitespace/revealed text fall through to the
+   answer hit layer, while the translation toggle itself remains independently
+   interactive. */
+.chapter-choice-with-help > .jp-help.compact {
+  pointer-events: none;
+}
+
+.chapter-choice-with-help > .jp-help.compact .jp-toggle {
+  pointer-events: auto;
+}
