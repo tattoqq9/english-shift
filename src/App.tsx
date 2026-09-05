@@ -10,16 +10,18 @@ import { Chapter7Screen } from './screens/Chapter7Screen'
 import { Chapter8Screen } from './screens/Chapter8Screen'
 import { GameLabScreen } from './screens/GameLabScreen'
 import { ExamShiftScreen } from './screens/ExamShiftScreen'
-import { HomeScreen } from './screens/HomeScreen'
-import { LearnScreen } from './screens/LearnScreen'
+import { JourneyScreen } from './screens/JourneyScreen'
 import { MasteryScreen } from './screens/MasteryScreen'
 import { MoreScreen } from './screens/MoreScreen'
 import { OnboardingScreen } from './screens/OnboardingScreen'
+import { ReviewScreen } from './screens/ReviewScreen'
+import { TodayScreen } from './screens/TodayScreen'
 import { Level2BuildScreen } from './screens/Level2BuildScreen'
 import { RepairLabScreen } from './screens/RepairLabScreen'
 import { FlowLabScreen } from './screens/FlowLabScreen'
 import { completeOnboarding, shouldShowOnboarding } from './core/onboarding'
 import { makeAppHistoryState, readAppHistoryView, type HistoryAppView } from './core/appHistory'
+import { queueShiftLaunch } from './core/shiftLaunch'
 import { DEBUG_UNLOCK_ALL_DAYS } from './runtimeMode'
 
 export type AppView = HistoryAppView
@@ -64,8 +66,6 @@ export default function App() {
       window.removeEventListener('popstate', handlePopState)
       window.history.scrollRestoration = previousScrollRestoration
     }
-    // The first rendered route owns the initial history entry. Subsequent
-    // navigation is written explicitly by navigate().
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -89,16 +89,14 @@ export default function App() {
   const finishOnboarding = (destination: AppView, reason: 'completed' | 'skipped') => {
     try { completeOnboarding(window.localStorage, reason) } catch { /* do not block navigation */ }
     setOnboardingReturnView(null)
-    // Replace the onboarding entry so Android/browser Back does not reopen a
-    // tutorial that the learner has just finished or skipped.
     navigate(destination, { replace: true })
   }
 
   if (view === 'onboarding') {
     return (
-      <div className="app-shell app-shell-v041">
+      <div className="app-shell app-shell-v060">
         <OnboardingScreen
-          onStart={() => finishOnboarding('chapter1', 'completed')}
+          onStart={() => { queueShiftLaunch(1, 1, true, window.sessionStorage); finishOnboarding('chapter1', 'completed') }}
           onSkip={() => finishOnboarding(onboardingReturnView ?? 'home', 'skipped')}
         />
       </div>
@@ -106,42 +104,44 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell app-shell-v041">
+    <div className="app-shell app-shell-v060">
       {DEBUG_UNLOCK_ALL_DAYS && <div className="debug-mode-badge">DEBUG · ALL DAYS UNLOCKED</div>}
       <TopBar view={view} onChangeView={navigate} />
       {view === 'home'
-        ? <HomeScreen onNavigate={navigate} />
+        ? <TodayScreen onNavigate={navigate} />
         : view === 'learn'
-          ? <LearnScreen onNavigate={navigate} />
+          ? <JourneyScreen onNavigate={navigate} />
           : view === 'more'
             ? <MoreScreen onNavigate={navigate} />
             : view === 'lab'
               ? <GameLabScreen />
               : view === 'mastery'
-                ? <MasteryScreen />
-                : view === 'build'
-                  ? <Level2BuildScreen />
-                  : view === 'repair'
-                    ? <RepairLabScreen />
-                    : view === 'flow'
-                      ? <FlowLabScreen />
-                      : view === 'exam'
-                    ? <ExamShiftScreen />
-                    : view === 'chapter1'
-                      ? <Chapter1Screen />
-                      : view === 'chapter2'
-                        ? <Chapter2Screen />
-                        : view === 'chapter3'
-                          ? <Chapter3Screen />
-                          : view === 'chapter4'
-                            ? <Chapter4Screen />
-                            : view === 'chapter5'
-                              ? <Chapter5Screen />
-                              : view === 'chapter6'
-                                ? <Chapter6Screen />
-                                : view === 'chapter7'
-                                  ? <Chapter7Screen />
-                                  : <Chapter8Screen />}
+                ? <ReviewScreen onNavigate={navigate} />
+                : view === 'masteryDetails'
+                  ? <MasteryScreen />
+                  : view === 'build'
+                    ? <Level2BuildScreen onNavigate={navigate} />
+                    : view === 'repair'
+                      ? <RepairLabScreen />
+                      : view === 'flow'
+                        ? <FlowLabScreen />
+                        : view === 'exam'
+                          ? <ExamShiftScreen />
+                          : view === 'chapter1'
+                            ? <Chapter1Screen onNavigate={navigate} />
+                            : view === 'chapter2'
+                              ? <Chapter2Screen onNavigate={navigate} />
+                              : view === 'chapter3'
+                                ? <Chapter3Screen onNavigate={navigate} />
+                                : view === 'chapter4'
+                                  ? <Chapter4Screen onNavigate={navigate} />
+                                  : view === 'chapter5'
+                                    ? <Chapter5Screen onNavigate={navigate} />
+                                    : view === 'chapter6'
+                                      ? <Chapter6Screen onNavigate={navigate} />
+                                      : view === 'chapter7'
+                                        ? <Chapter7Screen onNavigate={navigate} />
+                                        : <Chapter8Screen onNavigate={navigate} />}
     </div>
   )
 }

@@ -50,7 +50,7 @@ function useTranslationTracker(): TranslationTracker {
 
 function scrollToResult() {
   const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  requestAnimationFrame(() => document.querySelector('.chapter-activity-result')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }))
+  requestAnimationFrame(() => document.querySelector('.chapter-result-reaction')?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' }))
 }
 
 function emotionForScore(score: number) {
@@ -345,7 +345,8 @@ function LanguageReview({ activity, entries, hintsUsed }: { activity: Chapter1Ac
   )
 }
 
-function ActivityResultPanel({ result, bestRoute, onContinue, continueLabel = 'Continue', languageReview, answerReview }: {
+function ActivityResultPanel({ activity, result, bestRoute, onContinue, continueLabel = 'Continue', languageReview, answerReview }: {
+  activity: Chapter1Activity
   result: Chapter1Result
   bestRoute: string[]
   onContinue: () => void
@@ -354,8 +355,35 @@ function ActivityResultPanel({ result, bestRoute, onContinue, continueLabel = 'C
   answerReview: React.ReactNode
 }) {
   const grade = gradeFromPercent(result.total)
+  const reaction = emotionForScore(result.total)
+  const reactionCopy = result.total >= 95
+    ? 'Great response.'
+    : result.total >= 82
+      ? 'Nice choice.'
+      : result.total >= 60
+        ? 'Good try — check one point.'
+        : 'Let’s review this one.'
   return (
     <section className={`chapter-activity-result result-grade-${grade.toLowerCase()}`}>
+      <div className="chapter-result-reaction" aria-live="polite">
+        <CustomerPortrait
+          customerId={activity.customer.id}
+          customerName={activity.customer.name}
+          emotion={reaction.emotion}
+          motion={reaction.motion}
+          reactionTick={result.total + 10}
+          variant="result"
+        />
+        <div className="chapter-result-reaction-copy">
+          <span>{activity.customer.name.toUpperCase()} · REACTION</span>
+          <strong>{reactionCopy}</strong>
+          <p>回答結果と一緒にCustomerの反応を確認できます。</p>
+        </div>
+        <div className="chapter-result-reaction-score">
+          <strong>{result.total}</strong>
+          <span className={`grade-badge grade-${grade.toLowerCase()}`}>{grade}</span>
+        </div>
+      </div>
       <div className="chapter-result-head">
         <div>
           <div className="eyebrow">ACTIVITY RESULT</div>
@@ -421,6 +449,7 @@ function DirectActivity({ activity, onComplete }: { activity: Chapter1DialogueAc
       ]} />}
       {result && choice && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}
@@ -500,6 +529,7 @@ function HuntActivity({ activity, onComplete }: { activity: Chapter1InformationH
       )}
       {result && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}
@@ -596,6 +626,7 @@ function TroubleshootingActivity({ activity, onComplete }: { activity: Chapter1T
       )}
       {result && solution && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}
@@ -699,6 +730,7 @@ function StaffCoordinationActivity({ activity, onComplete }: { activity: Chapter
       ]} />}
       {result && handoff && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}
@@ -806,6 +838,7 @@ function IncidentInvestigationActivity({ activity, onComplete }: { activity: Cha
 
       {result && conclusion && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}
@@ -898,6 +931,7 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
       )}
       {result && (
         <ActivityResultPanel
+          activity={activity}
           result={result}
           bestRoute={activity.bestRoute}
           onContinue={() => onComplete(result.total, tracker.used.size)}

@@ -1,0 +1,23 @@
+:root {
+  --v060-canvas: #f7f8fc;
+  --v060-surface: #ffffff;
+  --v060-surface-soft: #f0f3fa;
+  --v060-ink: #172033;
+  --v060-muted: #667085;
+  --v060-border: #e3e7ef;
+  --v060-brand: #5367ff;
+  --v060-brand-soft: #eef0ff;
+  --v060-select: #3e7bfa;
+  --v060-select-soft: #eaf2ff;
+  --v060-build: #f29b55;
+  --v060-build-soft: #fff0e4;
+  --v060-repair: #8b63e6;
+  --v060-repair-soft: #f1ebff;
+  --v060-success: #25a981;
+  --v060-warning: #d98935;
+  --v060-shadow-sm: 0 8px 24px rgba(36, 48, 77, 0.07);
+  --v060-shadow-md: 0 18px 48px rgba(36, 48, 77, 0.10);
+  --v060-radius-sm: 12px;
+  --v060-radius: 18px;
+  --v060-radius-lg: 24px;
+}

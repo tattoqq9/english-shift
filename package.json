@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.6.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -29,7 +29,13 @@
     "character:assets": "node scripts/character-assets-smoke.mjs",
     "character:integration": "tsc -p tsconfig.core.json && node .core-build/scripts/character-integration-smoke.js",
     "v051:smoke": "node scripts/v051-release-smoke.mjs",
-    "v051:check": "npm run version:sync && npm run v051:smoke && npm run rc:check"
+    "v051:check": "npm run version:sync && npm run v051:smoke && npm run rc:check",
+    "v060:shell": "node scripts/v060-shell-smoke.mjs",
+    "v060:check": "npm run v060:shell && npm run rc:check",
+    "v060:rc:smoke": "node scripts/v060-rc-smoke.mjs",
+    "v060:rc": "npm run version:sync && npm run v060:check && npm run v060:rc:smoke && npm run rc:check",
+    "v060:release:smoke": "node scripts/v060-release-smoke.mjs",
+    "v060:release": "npm run version:sync && npm run v060:check && npm run v060:rc:smoke && npm run v060:release:smoke && npm run rc:check"
   },
   "dependencies": {
     "react": "^19.2.7",

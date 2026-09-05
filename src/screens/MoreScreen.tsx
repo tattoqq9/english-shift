@@ -3,46 +3,93 @@ import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 
 export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void }) {
   return (
-    <main className="more-shell">
-      <section className="more-hero">
-        <div className="eyebrow">MORE</div>
-        <h2>Tools & Extras</h2>
-        <p>毎日の学習に必須ではない機能は、メインの学習導線から分離してここにまとめます。</p>
+    <main className="v060-hub-main v060-more v060-more-v4">
+      <section className="v060-page-intro">
+        <div>
+          <span className="v060-kicker">MORE</span>
+          <h1>Optional tools</h1>
+          <p>毎日の学習に必須ではない機能と情報だけをまとめています。</p>
+        </div>
       </section>
 
-      <section className="more-card-grid">
-        <button className="more-card" onClick={() => onNavigate('onboarding')}>
-          <span>GUIDE</span>
-          <strong>Getting Started</strong>
-          <p>SELECT → BUILD → REPAIR / MASTERYの学習ループを、チュートリアルでもう一度確認できます。進捗は変更しません。</p>
-          <em>View tutorial →</em>
-        </button>
-        <button className="more-card" onClick={() => onNavigate('lab')}>
-          <span>EXPERIMENTAL</span>
-          <strong>Game Lab</strong>
-          <p>Recommendation / Investigation / Troubleshooting / Handoff / Incidentのゲーム形式を確認できます。</p>
-          <em>Open Lab →</em>
-        </button>
-        <article className="more-card info">
-          <span>CURRICULUM</span>
-          <strong>ES Grammar System</strong>
-          <p>Level 1でES-G1/G2、Exam ShiftでES-G3をカバー。Level 2は英文生成、Advanced TrainingはREPAIR / FLOWとして能力別に分離しています。</p>
-          <em>G1 + G2 + G3</em>
-        </article>
-        <article className="more-card info">
-          <span>RELEASE</span>
-          <strong>v0.5.1 · Characters & Context</strong>
-          <p>11人のRecurring Castを6表情で統一し、SELECTとBUILDで同じ人物を継承。Rapid / Queueも対応中のCustomerを個別表示し、人物設定に合わせて教材文を同期調整しました。</p>
-          <em>Character integration pass</em>
-        </article>
-        {DEBUG_UNLOCK_ALL_DAYS && (
-          <article className="more-card debug">
-            <span>DEBUG MODE</span>
-            <strong>All learning routes unlocked</strong>
-            <p>全Day・BUILD・Exam Shiftを進捗に関係なく直接確認できます。保存済み進捗自体は変更しません。</p>
-            <em>Developer launch</em>
+      <section className="v060-more-section">
+        <div className="v060-more-section-head">
+          <small>HELP</small>
+          <strong>English Shiftの使い方</strong>
+        </div>
+        <div className="v060-more-list">
+          <button className="v060-more-row" onClick={() => onNavigate('onboarding')}>
+            <span>
+              <small>3-STEP GUIDE</small>
+              <strong>How English Shift works</strong>
+              <p>Today / Shifts / Reviewと、SELECT → BUILD → Reviewの流れを約30秒で確認。</p>
+            </span>
+            <em>Open →</em>
+          </button>
+        </div>
+      </section>
+
+      <section className="v060-more-section">
+        <div className="v060-more-section-head">
+          <small>OPTIONAL TRAINING</small>
+          <strong>Labs</strong>
+        </div>
+        <div className="v060-more-list">
+          <button className="v060-more-row" onClick={() => onNavigate('lab')}>
+            <span>
+              <small>EXPERIMENTAL</small>
+              <strong>Game Lab</strong>
+              <p>Recommendation / Investigation / Troubleshootingなど、別形式の問題を試す。</p>
+            </span>
+            <em>Open →</em>
+          </button>
+
+          <button className="v060-more-row" onClick={() => onNavigate('flow')}>
+            <span>
+              <small>OPTIONAL</small>
+              <strong>FLOW LAB</strong>
+              <p>複数の応答を並べ、会話全体の流れを組み立てる追加トレーニング。</p>
+            </span>
+            <em>Open →</em>
+          </button>
+        </div>
+      </section>
+
+      <section className="v060-more-section">
+        <div className="v060-more-section-head">
+          <small>ABOUT</small>
+          <strong>Curriculum & version</strong>
+        </div>
+        <div className="v060-more-list">
+          <article className="v060-more-row info">
+            <span>
+              <small>CURRICULUM</small>
+              <strong>96 grammar concepts</strong>
+              <p>ES-G1 / G2 / G3を、SELECT / BUILD / REPAIRの能力別に学習・測定します。</p>
+            </span>
+            <em>G1 · G2 · G3</em>
           </article>
-        )}
+
+          <article className="v060-more-row info">
+            <span>
+              <small>VERSION</small>
+              <strong>v0.6.0 · UI/UX Reboot</strong>
+              <p>Today / Shifts / Reviewを中心に、学習導線・Shift体験・Result・Reviewを再設計。</p>
+            </span>
+            <em>RC prep</em>
+          </article>
+
+          {DEBUG_UNLOCK_ALL_DAYS && (
+            <article className="v060-more-row debug">
+              <span>
+                <small>DEBUG MODE</small>
+                <strong>All learning routes unlocked</strong>
+                <p>実機確認用。保存済み進捗そのものは変更しません。</p>
+              </span>
+              <em>DEV</em>
+            </article>
+          )}
+        </div>
       </section>
     </main>
   )

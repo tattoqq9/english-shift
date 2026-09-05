@@ -4,6 +4,7 @@ export const APP_VIEWS = [
   'home',
   'learn',
   'mastery',
+  'masteryDetails',
   'more',
   'onboarding',
   'chapter1',

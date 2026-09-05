@@ -11,39 +11,101 @@ type Step = {
   title: string
   body: string
   accent: string
-  detail?: string
+  kind: 'welcome' | 'loop' | 'navigation'
 }
 
 const STEPS: Step[] = [
   {
     eyebrow: 'WELCOME TO ENGLISH SHIFT',
-    title: '英語を「見分ける・作る・直す」で身につける。',
-    body: '接客シーンの中で英文法を使いながら、理解だけで終わらず、自分で使える英語へ段階的に進みます。',
+    title: 'まず、1 Shiftだけやってみる。',
+    body: '接客シーンの中で英語を選び、使った表現をその日のうちに自分で組み立てます。最初から大量のメニューを覚える必要はありません。',
+    accent: 'ABOUT 4 MIN',
+    kind: 'welcome',
+  },
+  {
+    eyebrow: 'HOW YOU LEARN',
+    title: '見分ける → 作る → 弱点を直す。',
+    body: '各DayはSELECTを終えると同じDayのBUILDが解放されます。苦手が見えてきたらReviewとREPAIRで必要な力だけを短く復習します。',
     accent: '3 SKILLS',
-    detail: 'SELECT · BUILD · REPAIR',
+    kind: 'loop',
   },
   {
-    eyebrow: 'STEP 1 · SELECT',
-    title: 'まず、正しい英語を見分ける。',
-    body: 'Level 1では、接客シーンで質問・提案・説明を選びながら、中学〜高校英文法の土台を身につけます。',
-    accent: 'LEVEL 1',
-    detail: 'Recognition / 見分ける力',
-  },
-  {
-    eyebrow: 'STEP 2 · BUILD',
-    title: '次に、自分で英文を組み立てる。',
-    body: 'Level 2ではLevel 1と対応した場面を使い、chunkを自然な語順へ並べて、自分で英文を作る力を鍛えます。',
-    accent: 'LEVEL 2',
-    detail: 'Production / 作る力',
-  },
-  {
-    eyebrow: 'STEP 3 · MASTERY',
-    title: '苦手な「能力」まで見つけて復習する。',
-    body: 'Grammar MasteryはSELECT / BUILD / REPAIRを文法ごとに別々に記録します。Weakness Reviewでは、弱い能力に合った問題を優先して復習できます。',
-    accent: 'MASTERY',
-    detail: 'Measure → Review → Improve',
+    eyebrow: 'YOU ONLY NEED THREE PLACES',
+    title: '迷ったらTodayを開けば大丈夫。',
+    body: 'Todayは今やること、Shiftsは店舗とDayを選ぶ場所、Reviewは弱点を直す場所です。Moreは必要なときだけ使います。',
+    accent: 'READY',
+    kind: 'navigation',
   },
 ]
+
+function WelcomePreview() {
+  return (
+    <div className="onboarding-shift-preview" aria-label="Example Shift">
+      <div
+        className="onboarding-shift-image"
+        style={{ backgroundImage: "url('/backgrounds/chapter-1-convenience.webp')" }}
+        aria-hidden="true"
+      >
+        <span>CONVENIENCE STORE</span>
+        <strong>Day 1</strong>
+      </div>
+      <div className="onboarding-shift-preview-body">
+        <span>FIRST SHIFT</span>
+        <strong>3 Activities</strong>
+        <small>状況を見る → 英語を選ぶ → 結果を確認</small>
+      </div>
+    </div>
+  )
+}
+
+function LearningLoopPreview() {
+  return (
+    <div className="onboarding-loop-preview" aria-label="English Shift learning loop">
+      <div className="select">
+        <span>01</span>
+        <small>SELECT</small>
+        <strong>見分ける</strong>
+        <em>3 Activities</em>
+      </div>
+      <div className="onboarding-loop-arrow" aria-hidden="true">→</div>
+      <div className="build">
+        <span>02</span>
+        <small>BUILD</small>
+        <strong>作る</strong>
+        <em>SELECT後に解放</em>
+      </div>
+      <div className="onboarding-loop-arrow" aria-hidden="true">→</div>
+      <div className="repair">
+        <span>03</span>
+        <small>REVIEW</small>
+        <strong>弱点を直す</strong>
+        <em>必要なときだけ</em>
+      </div>
+    </div>
+  )
+}
+
+function NavigationPreview() {
+  return (
+    <div className="onboarding-nav-preview" aria-label="Main navigation">
+      <div className="primary">
+        <span>01</span>
+        <strong>Today</strong>
+        <small>今やる</small>
+      </div>
+      <div>
+        <span>02</span>
+        <strong>Shifts</strong>
+        <small>選ぶ・Replay</small>
+      </div>
+      <div>
+        <span>03</span>
+        <strong>Review</strong>
+        <small>弱点を直す</small>
+      </div>
+    </div>
+  )
+}
 
 export function OnboardingScreen({ onStart, onSkip }: Props) {
   const [stepIndex, setStepIndex] = useState(0)
@@ -61,46 +123,43 @@ export function OnboardingScreen({ onStart, onSkip }: Props) {
             <span>ES</span>
             <strong>English Shift</strong>
           </div>
-          <button type="button" className="onboarding-skip" onClick={onSkip}>Skip</button>
+          <button type="button" className="onboarding-skip" onClick={onSkip}>
+            Skip guide
+          </button>
         </div>
 
-        <div className="onboarding-progress" aria-label={`Onboarding step ${stepIndex + 1} of ${STEPS.length}`}>
+        <div className="onboarding-progress" aria-label={`Guide ${stepIndex + 1} of ${STEPS.length}`}>
           {STEPS.map((_, index) => (
             <span key={index} className={index <= stepIndex ? 'active' : ''} />
           ))}
         </div>
 
         <div className="onboarding-content">
-          <div className="onboarding-step-mark"><span>{String(stepIndex + 1).padStart(2, '0')}</span><em>{step.accent}</em></div>
+          <div className="onboarding-step-mark">
+            <span>{String(stepIndex + 1).padStart(2, '0')}</span>
+            <em>{step.accent}</em>
+          </div>
           <div className="eyebrow">{step.eyebrow}</div>
           <h1>{step.title}</h1>
           <p>{step.body}</p>
-          {step.detail && <div className="onboarding-detail">{step.detail}</div>}
 
-          {stepIndex === 0 && (
-            <div className="onboarding-skill-grid" aria-label="English Shift skills">
-              <div><span>SELECT</span><strong>見分ける</strong></div>
-              <div><span>BUILD</span><strong>作る</strong></div>
-              <div><span>REPAIR</span><strong>直す</strong></div>
-            </div>
-          )}
-
-          {stepIndex === 3 && (
-            <div className="onboarding-mastery-preview">
-              <div><span>SELECT</span><strong>91%</strong></div>
-              <div><span>BUILD</span><strong>62%</strong></div>
-              <div><span>REPAIR</span><strong>78%</strong></div>
-              <small>例：BUILDが弱ければLevel 2の復習を優先</small>
-            </div>
-          )}
+          {step.kind === 'welcome' && <WelcomePreview />}
+          {step.kind === 'loop' && <LearningLoopPreview />}
+          {step.kind === 'navigation' && <NavigationPreview />}
         </div>
 
         <div className="onboarding-actions">
-          <button type="button" className="onboarding-back" onClick={previous} disabled={stepIndex === 0}>Back</button>
+          <button type="button" className="onboarding-back" onClick={previous} disabled={stepIndex === 0}>
+            Back
+          </button>
           {last ? (
-            <button type="button" className="onboarding-primary" onClick={onStart}>Start Level 1</button>
+            <button type="button" className="onboarding-primary" onClick={onStart}>
+              Start Day 1
+            </button>
           ) : (
-            <button type="button" className="onboarding-primary" onClick={next}>Next</button>
+            <button type="button" className="onboarding-primary" onClick={next}>
+              Next
+            </button>
           )}
         </div>
       </section>

@@ -1,7 +1,10 @@
-import { useState } from 'react'
-import { isDayUnlocked } from '../runtimeMode'
+import type { AppView } from '../App'
+import { useEffect, useState } from 'react'
+import { clearShiftLaunch, readShiftLaunch } from '../core/shiftLaunch'
+import { queueBuildDayLaunch } from '../core/buildDayFlow'
 import { ChapterActivityPlayer } from '../components/ChapterActivityPlayer'
-import { gradeFromPercent } from '../core/chapter1'
+import { ShiftDayResult, ShiftIntro } from '../components/ShiftExperience'
+import { StoreShiftMap } from '../components/StoreShiftMap'
 import { chapter1ActivityById, chapter1Days } from '../data/chapter1'
 
 const STORAGE_KEY = 'english-shift-chapter1-progress-v1'
@@ -38,113 +41,28 @@ function scrollTop() {
   requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }))
 }
 
-function ChapterMap({ progress, onSelectDay, onReset }: { progress: ChapterProgress; onSelectDay: (day: number) => void; onReset: () => void }) {
-  const unlockedDay = Math.min(6, Math.max(1, progress.completedDays.length + 1))
-  const chapterComplete = progress.completedDays.includes(6)
-
-  return (
-    <main className="chapter-map">
-      <section className="chapter-hero">
-        <div>
-          <div className="eyebrow">LEVEL 1 · CHAPTER 1</div>
-          <h2>Convenience Store</h2>
-          <p>基本接客から始め、6日目には質問・案内・会計・トラブル対応を混ぜたBusy Shiftへ進みます。</p>
-        </div>
-        <div className="chapter-progress-ring"><strong>{progress.completedDays.length}</strong><span>/ 6 shifts</span></div>
-      </section>
-
-      <div className="chapter-day-grid">
-        {chapter1Days.map((day) => {
-          const completed = progress.completedDays.includes(day.day)
-          const unlocked = isDayUnlocked(completed || day.day <= unlockedDay)
-          const best = progress.bestScores[String(day.day)]
-          return (
-            <button key={day.day} className={`chapter-day-card ${completed ? 'completed' : ''}`} disabled={!unlocked} onClick={() => onSelectDay(day.day)}>
-              <div className="chapter-day-number">DAY {day.day}</div>
-              <h3>{day.title}</h3>
-              <p>{day.subtitle}</p>
-              <div className="chapter-day-meta"><span>{day.gameFocus}</span><strong>{completed ? `✓ ${best ?? 0}%` : unlocked ? 'PLAY' : 'LOCKED'}</strong></div>
-            </button>
-          )
-        })}
-      </div>
-
-      {chapterComplete && (
-        <section className="chapter-clear-card">
-          <div className="eyebrow">CHAPTER CLEAR</div>
-          <h2>Convenience Store Complete</h2>
-          <p>Level 1の基本接客範囲を一周しました。次Chapterでは比較・用途・商品推薦を本格化できます。</p>
-        </section>
-      )}
-
-      <details className="chapter-reset-details">
-        <summary>Progress options</summary>
-        <button className="secondary-button" onClick={onReset}>Reset Chapter 1 progress</button>
-      </details>
-    </main>
-  )
+function ChapterMap({ progress, onSelectDay, onBuildDay, onReset }: { progress: ChapterProgress; onSelectDay: (day: number) => void; onBuildDay?: (day: number) => void; onReset: () => void }) {
+  return <StoreShiftMap chapterId={1} days={chapter1Days} progress={progress} onSelectDay={onSelectDay} onBuildDay={onBuildDay} onReset={onReset} />
 }
 
 function DayIntro({ dayNumber, onStart, onBack }: { dayNumber: number; onStart: () => void; onBack: () => void }) {
   const day = chapter1Days.find((item) => item.day === dayNumber)!
-  return (
-    <main className="chapter-day-intro">
-      <button className="chapter-back" onClick={onBack}>← Chapter map</button>
-      <div className="eyebrow">CHAPTER 1 · DAY {day.day}</div>
-      <h2>{day.title}</h2>
-      <p className="chapter-day-subtitle">{day.subtitle}</p>
-      <div className="chapter-plan-grid">
-        <div><span>Game focus</span><strong>{day.gameFocus}</strong></div>
-        <div><span>Activities</span><strong>{day.activityIds.length}</strong></div>
-      </div>
-      <section className="chapter-language-card">
-        <div><strong>NEW</strong>{day.newLanguage.length ? day.newLanguage.map((item) => <span key={item}>{item}</span>) : <span>新規なし・総復習</span>}</div>
-        <div><strong>REVIEW</strong>{day.reviewLanguage.length ? day.reviewLanguage.map((item) => <span key={item}>{item}</span>) : <span>—</span>}</div>
-      </section>
-      <section className="chapter-can-do"><div className="eyebrow">TODAY'S CAN-DO</div>{day.canDo.map((item) => <p key={item}>✓ {item}</p>)}</section>
-      <button className="primary chapter-start" onClick={onStart}>Start Day {day.day}</button>
-    </main>
-  )
+  return <ShiftIntro chapterId={1} day={day} onStart={onStart} onBack={onBack} />
 }
 
-function DayResult({ dayNumber, scores, hintCounts, onFinish }: { dayNumber: number; scores: number[]; hintCounts: number[]; onFinish: (percent: number, hintsUsed: number) => void }) {
+function DayResult({ dayNumber, scores, hintCounts, onFinish, onBuild }: { dayNumber: number; scores: number[]; hintCounts: number[]; onFinish: (percent: number, hintsUsed: number) => void; onBuild?: () => void }) {
   const day = chapter1Days.find((item) => item.day === dayNumber)!
-  const total = scores.reduce((sum, value) => sum + value, 0)
-  const max = day.activityIds.length * 100
-  const percent = max ? Math.round((total / max) * 100) : 0
-  const grade = gradeFromPercent(percent)
-  const hintsUsed = hintCounts.reduce((sum, value) => sum + value, 0)
-
-  return (
-    <main className="chapter-day-result">
-      <div className="eyebrow">SHIFT COMPLETE · DAY {day.day}</div>
-      <div className="chapter-result-head">
-        <div><h2>{day.title} Complete</h2><p>{day.subtitle}</p></div>
-        <div className={`grade-badge grade-${grade.toLowerCase()}`}>{grade}</div>
-      </div>
-      <div className="chapter-day-score-grid">
-        <div><span>Score</span><strong>{percent}%</strong></div>
-        <div><span>Activities</span><strong>{scores.length}/{day.activityIds.length}</strong></div>
-        <div><span>Best activity</span><strong>{Math.max(...scores)}%</strong></div>
-        <div><span>Japanese hints</span><strong>{hintsUsed}</strong></div>
-      </div>
-      <div className="chapter-hint-note">日本語ヒントは減点されません。少ないほど、自力で読めた英文が増えた目安になります。</div>
-      <section className="chapter-can-do result-can-do">
-        <div className="eyebrow">YOU PRACTICED</div>
-        {day.canDo.map((item) => <p key={item}>✓ {item}</p>)}
-      </section>
-      <div className="chapter-activity-score-list">
-        {scores.map((score, index) => <div key={index}><span>Activity {index + 1}</span><strong>{score}/100</strong></div>)}
-      </div>
-      <button className="primary chapter-start" onClick={() => onFinish(percent, hintsUsed)}>{day.day === 6 ? 'Complete Chapter' : 'Finish Day'}</button>
-    </main>
-  )
+  return <ShiftDayResult chapterId={1} day={day} scores={scores} hintCounts={hintCounts} onFinish={onFinish} onBuild={onBuild} />
 }
 
-export function Chapter1Screen() {
+export function Chapter1Screen({ onNavigate }: { onNavigate?: (view: AppView) => void }) {
+  const [launchRequest] = useState(() => readShiftLaunch(1, window.sessionStorage))
+  useEffect(() => {
+    if (launchRequest) clearShiftLaunch(window.sessionStorage)
+  }, [launchRequest])
   const [progress, setProgress] = useState<ChapterProgress>(() => readProgress())
-  const [selectedDay, setSelectedDay] = useState<number | null>(null)
-  const [started, setStarted] = useState(false)
+  const [selectedDay, setSelectedDay] = useState<number | null>(() => launchRequest?.day ?? null)
+  const [started, setStarted] = useState(() => Boolean(launchRequest?.autoStart))
   const [activityIndex, setActivityIndex] = useState(0)
   const [scores, setScores] = useState<number[]>([])
   const [hintCounts, setHintCounts] = useState<number[]>([])
@@ -209,9 +127,9 @@ export function Chapter1Screen() {
     scrollTop()
   }
 
-  if (!selectedDay) return <ChapterMap progress={progress} onSelectDay={selectDay} onReset={reset} />
+  if (!selectedDay) return <ChapterMap progress={progress} onSelectDay={selectDay} onBuildDay={onNavigate ? (day) => { queueBuildDayLaunch(day, window.sessionStorage); onNavigate('build') } : undefined} onReset={reset} />
   if (!started) return <DayIntro dayNumber={selectedDay} onStart={startDay} onBack={() => { setSelectedDay(null); scrollTop() }} />
-  if (dayDone) return <DayResult dayNumber={selectedDay} scores={scores} hintCounts={hintCounts} onFinish={finishDay} />
+  if (dayDone) return <DayResult dayNumber={selectedDay} scores={scores} hintCounts={hintCounts} onFinish={finishDay} onBuild={onNavigate ? () => { queueBuildDayLaunch(selectedDay, window.sessionStorage); onNavigate('build') } : undefined} />
   if (!activity || !day) return <main className="chapter-day-result"><h2>Activity data not found.</h2></main>
 
   return (

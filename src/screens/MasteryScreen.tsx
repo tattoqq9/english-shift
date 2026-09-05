@@ -18,7 +18,7 @@ import {
 import { weaknessPriorityBySkill, type ReviewFocusRef } from '../core/review'
 import { grammarRegistry, grammarRegistryByKey } from '../data/grammarRegistry'
 import { grammarTargetsForActivity } from '../data/grammarRuntime'
-import { buildWeaknessReviewActivities, type WeaknessReviewRuntimeItem } from '../data/reviewRuntime'
+import { buildProgressAwareWeaknessReviewActivities, type WeaknessReviewRuntimeItem } from '../data/reviewRuntime'
 import '../styles/masterySkills.css'
 
 const TIER_ORDER: GrammarTier[] = ['ES-G1', 'ES-G2', 'ES-G3']
@@ -101,7 +101,7 @@ export function MasteryScreen() {
     .filter((row) => row.overall!.mastery >= 75)
     .sort((a, b) => b.overall!.mastery - a.overall!.mastery)
     .slice(0, 6)
-  const reviewPreview = useMemo(() => buildWeaknessReviewActivities(progress, 5), [progress])
+  const reviewPreview = useMemo(() => buildProgressAwareWeaknessReviewActivities(progress, 5, window.localStorage), [progress])
   const legacyPreserved = hasLegacyMastery(progress)
 
   const skillSummary = SKILL_ORDER.map((skill) => {
@@ -121,7 +121,7 @@ export function MasteryScreen() {
   }
 
   const startWeaknessReview = () => {
-    const plan = buildWeaknessReviewActivities(progress, 5)
+    const plan = buildProgressAwareWeaknessReviewActivities(progress, 5, window.localStorage)
     if (plan.items.length === 0) return
     setReview({
       items: plan.items,

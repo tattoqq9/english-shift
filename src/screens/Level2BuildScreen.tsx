@@ -1,134 +1,245 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import type { AppView } from '../App'
 import { BuildActivityPlayer } from '../components/BuildActivityPlayer'
-import { buildPresentation, readBuildMode, readBuildProgress, saveBuildMode, saveBuildResult, BUILD_PROGRESS_KEY, type BuildActivity, type BuildMode } from '../core/build'
-import { masteryStats, readMasteryProgress } from '../core/mastery'
+import {
+  buildPresentation,
+  readBuildMode,
+  readBuildProgress,
+  saveBuildMode,
+  saveBuildResult,
+  BUILD_PROGRESS_KEY,
+  type BuildActivity,
+  type BuildMode,
+  type BuildProgress,
+} from '../core/build'
+import { clearBuildDayLaunch, isSelectDayComplete, readBuildDayLaunch } from '../core/buildDayFlow'
 import { chapterMeta } from '../core/navigationProgress'
-import { level2BuildActivities, level2BuildById, level2BuildDayMeta } from '../data/level2BuildActivities'
-import { grammarRegistryByKey } from '../data/grammarRegistry'
+import { level2BuildActivities, level2BuildDayMeta } from '../data/level2BuildActivities'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 
-function level1Complete() {
-  if (DEBUG_UNLOCK_ALL_DAYS) return true
-  let completed = 0
-  for (let chapter = 1; chapter <= 8; chapter += 1) {
-    try {
-      const raw = localStorage.getItem(`english-shift-chapter${chapter}-progress-v1`)
-      if (!raw) continue
-      const parsed = JSON.parse(raw) as { completedDays?: number[] }
-      const firstDay = (chapter - 1) * 6 + 1
-      const expected = Array.from({ length: 6 }, (_, index) => firstDay + index)
-      completed += expected.filter((day) => parsed.completedDays?.includes(day)).length
-    } catch { /* ignore */ }
-  }
-  return completed === 48
+type Props = {
+  onNavigate: (view: AppView) => void
 }
 
-function validCompletedIds(ids: string[]) {
-  return new Set(ids.filter((id) => level2BuildById.has(id)))
+const modeCopy: Record<BuildMode, string> = {
+  standard: 'Standard',
+  guided: 'Guided',
+  challenge: 'Challenge',
 }
 
-function missionUnlocked(activity: BuildActivity, completed: Set<string>) {
-  if (DEBUG_UNLOCK_ALL_DAYS) return true
-  const index = level2BuildActivities.findIndex((item) => item.id === activity.id)
-  if (index <= 0) return true
-  return completed.has(level2BuildActivities[index - 1].id)
+function dayActivities(day: number) {
+  return level2BuildActivities
+    .filter((activity) => activity.day === day)
+    .sort((a, b) => a.activityNo - b.activityNo)
 }
 
-function recommendedActivity(completed: Set<string>) {
-  const mastery = readMasteryProgress(window.localStorage)
-  const unlockedActivities = level2BuildActivities.filter((activity) => missionUnlocked(activity, completed))
-  const remaining = unlockedActivities.filter((activity) => !completed.has(activity.id))
-  const pool = remaining.length ? remaining : unlockedActivities
-  return [...pool].sort((a, b) => {
-    const score = (activity: BuildActivity) => {
-      const values = activity.grammarTargets.map((ref) => mastery.entries[ref.key]).filter(Boolean).map((entry) => masteryStats(entry!).mastery)
-      return values.length ? Math.min(...values) : 50
-    }
-    return score(a) - score(b)
-  })[0]
+function dayBuildCompleted(day: number, progress: BuildProgress) {
+  const completed = new Set(progress.completedIds)
+  return dayActivities(day).filter((activity) => completed.has(activity.id)).length
 }
 
-const modeCopy: Record<BuildMode, { title: string; desc: string }> = {
-  standard: { title: 'Standard', desc: 'Days 1–12はStructure、13–30はSemi、31–48はFreeへ段階的に移行します。' },
-  guided: { title: 'Guided', desc: '全144問で文の役割を示すStructure Slotsを使います。' },
-  challenge: { title: 'Challenge', desc: '全144問をスロットなしのFree Build + Checkで進めます。' },
+function firstIncompleteIndex(day: number, progress: BuildProgress) {
+  const activities = dayActivities(day)
+  const completed = new Set(progress.completedIds)
+  const index = activities.findIndex((activity) => !completed.has(activity.id))
+  return index < 0 ? 0 : index
 }
 
-export function Level2BuildScreen() {
+function buildDayUnlocked(day: number) {
+  return DEBUG_UNLOCK_ALL_DAYS || isSelectDayComplete(day, window.localStorage)
+}
+
+function scrollTop() {
+  const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }))
+}
+
+export function Level2BuildScreen({ onNavigate }: Props) {
   const [progress, setProgress] = useState(() => readBuildProgress(window.localStorage))
   const [mode, setMode] = useState<BuildMode>(() => readBuildMode(window.localStorage))
-  const [active, setActive] = useState<BuildActivity | null>(null)
-  const unlocked = level1Complete()
-  const completed = useMemo(() => validCompletedIds(progress.completedIds), [progress])
-  const recommended = useMemo(() => recommendedActivity(completed), [progress, completed])
-  const activeIndex = active ? level2BuildActivities.findIndex((item) => item.id === active.id) : -1
-  const nextIncomplete = level2BuildActivities.find((activity) => !completed.has(activity.id))
-  const nextChapter = nextIncomplete?.chapter ?? 8
+  const [launchDay] = useState(() => readBuildDayLaunch(window.sessionStorage))
+  const initialDay = launchDay && buildDayUnlocked(launchDay) ? launchDay : null
+  const [activeDay, setActiveDay] = useState<number | null>(initialDay)
+  const [activityIndex, setActivityIndex] = useState(() => initialDay ? firstIncompleteIndex(initialDay, progress) : 0)
+  const [sessionScores, setSessionScores] = useState<number[]>([])
+  const [dayFinished, setDayFinished] = useState(false)
 
-  if (!unlocked) return <main className="build-screen-shell"><section className="build-level-locked"><div className="eyebrow">LEVEL 2 · BUILD</div><h2>Complete Level 1 to unlock BUILD.</h2><p>48 Shiftsを完了すると、Level 1の144 Activityを「選ぶ」から「自分で組み立てる」練習へ変換したLevel 2へ進めます。</p><strong>DEBUG起動では最初から全144問を確認できます。</strong></section></main>
+  useEffect(() => {
+    if (launchDay) clearBuildDayLaunch(window.sessionStorage)
+  }, [launchDay])
 
-  if (active) return <BuildActivityPlayer activity={active} mode={mode} presentation={buildPresentation(mode, activeIndex, active.day)} onExit={() => setActive(null)} onComplete={(score) => {
-    const next = saveBuildResult(progress, active.id, score); window.localStorage.setItem(BUILD_PROGRESS_KEY, JSON.stringify(next)); setProgress(next); setActive(null); window.scrollTo({ top: 0, behavior: 'smooth' })
-  }} />
+  const activeActivities = useMemo(() => activeDay ? dayActivities(activeDay) : [], [activeDay])
+  const activeActivity = activeActivities[activityIndex]
+  const completed = useMemo(() => new Set(progress.completedIds), [progress])
 
-  const changeMode = (next: BuildMode) => { setMode(next); saveBuildMode(next, window.localStorage) }
+  const openDay = (day: number) => {
+    if (!buildDayUnlocked(day)) return
+    setActiveDay(day)
+    setActivityIndex(firstIncompleteIndex(day, progress))
+    setSessionScores([])
+    setDayFinished(false)
+    scrollTop()
+  }
 
-  return <main className="build-screen-shell">
-    <section className="build-level-hero"><div><div className="eyebrow">LEVEL 2 · BUILD · FULL COURSE</div><h2>Build the English yourself.</h2><p>Level 1の全144 Activityと1対1で対応。同じ接客状況を、今度はchunkから自分で英文へ組み立てます。48 Days × 3 Activitiesです。</p></div><div className="build-level-progress"><strong>{completed.size}</strong><span>/ {level2BuildActivities.length} activities</span></div></section>
+  const exitDay = () => {
+    setActiveDay(null)
+    setActivityIndex(0)
+    setSessionScores([])
+    setDayFinished(false)
+    scrollTop()
+  }
 
-    <section className="build-mode-selector">
-      <div className="build-mode-selector-head"><span>BUILD MODE</span><strong>補助の量を選ぶ</strong><p>Standardが基本です。モードを変えても同じ144問・同じ進捗を使います。</p></div>
-      <div className="build-mode-options">{(Object.keys(modeCopy) as BuildMode[]).map((id) => <button key={id} className={mode === id ? 'active' : ''} onClick={() => changeMode(id)}><span>{mode === id ? '●' : '○'}</span><strong>{modeCopy[id].title}</strong><p>{modeCopy[id].desc}</p></button>)}</div>
-    </section>
+  const completeActivity = (activity: BuildActivity, score: number) => {
+    const next = saveBuildResult(progress, activity.id, score)
+    window.localStorage.setItem(BUILD_PROGRESS_KEY, JSON.stringify(next))
+    setProgress(next)
+    setSessionScores((scores) => [...scores, score])
 
-    <section className="build-system-guide"><div><span>1</span><strong>Days 1–12</strong><p>Structure Slotsで文の骨格を見ながら作る。</p></div><div><span>2</span><strong>Days 13–30</strong><p>Semi-Guidedで役割ラベルを外す。</p></div><div><span>3</span><strong>Days 31–48</strong><p>Free Build + Checkで自力生成する。</p></div></section>
+    if (activityIndex < activeActivities.length - 1) {
+      setActivityIndex((index) => index + 1)
+    } else {
+      setDayFinished(true)
+    }
+    scrollTop()
+  }
 
-    {recommended && <section className="build-recommended-card"><div><span>RECOMMENDED NEXT</span><strong>Day {recommended.day} · {recommended.title}</strong><small>現在のMasteryと解放済みActivityから選択</small></div><button className="primary" onClick={() => setActive(recommended)}>Start recommended</button></section>}
+  const changeMode = (next: BuildMode) => {
+    setMode(next)
+    saveBuildMode(next, window.localStorage)
+  }
 
-    <section className="build-course-list">
-      {chapterMeta.map((chapter) => {
-        const chapterActivities = level2BuildActivities.filter((activity) => activity.chapter === chapter.id)
-        const chapterCompleted = chapterActivities.filter((activity) => completed.has(activity.id)).length
-        const chapterPercent = Math.round((chapterCompleted / chapterActivities.length) * 100)
-        const chapterFirstDay = (chapter.id - 1) * 6 + 1
-        return <details key={chapter.id} className="build-chapter-group" open={DEBUG_UNLOCK_ALL_DAYS ? chapter.id === 1 : chapter.id === nextChapter}>
-          <summary>
-            <div className="build-chapter-number">{chapterCompleted === 18 ? '✓' : chapter.id}</div>
-            <div className="build-chapter-summary-copy"><span>CHAPTER {chapter.id} · DAYS {chapterFirstDay}–{chapterFirstDay + 5}</span><strong>{chapter.title}</strong><small>{chapter.subtitle}</small></div>
-            <div className="build-chapter-summary-progress"><strong>{chapterCompleted}/18</strong><span>{chapterPercent}%</span></div>
-          </summary>
-          <div className="build-day-list">
-            {Array.from({ length: 6 }, (_, dayOffset) => chapterFirstDay + dayOffset).map((day) => {
-              const meta = level2BuildDayMeta.find((item) => item.day === day)
-              const dayActivities = chapterActivities.filter((activity) => activity.day === day)
-              const dayCompleted = dayActivities.filter((activity) => completed.has(activity.id)).length
-              const dayUnlocked = DEBUG_UNLOCK_ALL_DAYS || dayActivities.some((activity) => missionUnlocked(activity, completed)) || dayCompleted > 0
-              const presentation = buildPresentation(mode, (day - 1) * 3, day)
-              return <details key={day} className={`build-day-group ${dayCompleted === 3 ? 'complete' : ''} ${!dayUnlocked ? 'locked' : ''}`} open={day === nextIncomplete?.day}>
-                <summary>
-                  <div><span>DAY {day}</span><strong>{meta?.title ?? `Build Day ${day}`}</strong><small>{meta?.subtitle ?? '3 BUILD Activities'}</small></div>
-                  <div className="build-day-summary-meta"><span className={`build-support-badge ${presentation}`}>{presentation === 'guided' ? 'Structure' : presentation === 'semi' ? 'Semi' : 'Free'}</span><strong>{dayCompleted}/3</strong></div>
-                </summary>
-                <div className="build-day-activities">
-                  {dayActivities.map((activity) => {
-                    const complete = completed.has(activity.id)
-                    const isUnlocked = missionUnlocked(activity, completed)
-                    const best = progress.bestScores[activity.id]
-                    return <article key={activity.id} className={`build-mission-card compact ${complete ? 'complete' : ''} ${!isUnlocked ? 'locked' : ''}`}>
-                      <div className="build-mission-card-top"><span>ACTIVITY {activity.activityNo}</span><strong>{activity.skill ?? ''}</strong></div>
-                      <h3>{activity.title}</h3>
-                      <div className="build-mission-grammar">{activity.grammarTargets.map((ref) => <span key={ref.key}>{grammarRegistryByKey.get(ref.key)?.labelJa ?? ref.key}</span>)}</div>
-                      <div className="build-mission-card-bottom"><span>{complete ? `Best ${best ?? 0}%` : isUnlocked ? 'Ready' : 'Locked'}</span><button className="secondary-button" disabled={!isUnlocked} onClick={() => setActive(activity)}>{complete ? 'Replay' : 'Start'}</button></div>
-                    </article>
-                  })}
-                </div>
-              </details>
-            })}
+  if (activeDay && dayFinished) {
+    const activities = dayActivities(activeDay)
+    const bestScores = activities
+      .map((activity) => progress.bestScores[activity.id] ?? 0)
+      .filter((score) => score > 0)
+    const bestAverage = bestScores.length
+      ? Math.round(bestScores.reduce((sum, score) => sum + score, 0) / bestScores.length)
+      : 0
+    const meta = level2BuildDayMeta.find((item) => item.day === activeDay)
+
+    return (
+      <main className="v060-build-day-complete">
+        <section className="v060-build-day-complete-card">
+          <div className="v060-shift-complete-mark" aria-hidden="true">✓</div>
+          <span className="v060-kicker">BUILD COMPLETE</span>
+          <h1>Day {activeDay}</h1>
+          <h2>{meta?.title ?? 'Build the English'}</h2>
+          <p>同じDayの3 Activitiesを「見分ける」から「作る」へ進めました。</p>
+
+          <div className="v060-build-day-stats">
+            <div><span>BUILD</span><strong>{dayBuildCompleted(activeDay, progress)}/3</strong></div>
+            <div><span>Best avg.</span><strong>{bestAverage}%</strong></div>
+            <div><span>Mode</span><strong>{modeCopy[mode]}</strong></div>
           </div>
-        </details>
-      })}
-    </section>
 
-    <section className="build-foundation-note"><span>LEVEL 2 CURRICULUM</span><strong>48 Days × 3 Activities = 144 BUILD Activities</strong><p>Level 1と同じ接客状況・文法順序を使うため、「見分ける → 組み立てる」の学習転移をそのまま確認できます。REPAIR LAB / FLOW LABはAdvanced Trainingとして別コースのままです。</p></section>
-  </main>
+          <button className="v060-primary-cta" onClick={() => onNavigate('home')}>
+            Continue learning
+          </button>
+          <button className="v060-secondary-cta" onClick={() => onNavigate('learn')}>
+            Back to Shifts
+          </button>
+        </section>
+      </main>
+    )
+  }
+
+  if (activeDay && activeActivity) {
+    return (
+      <main className="v060-build-day-session">
+        <header className="v060-build-day-header">
+          <button type="button" onClick={exitDay}>← Exit BUILD</button>
+          <div>
+            <span>DAY {activeDay} · BUILD</span>
+            <strong>Activity {activityIndex + 1} / {activeActivities.length}</strong>
+          </div>
+          <div className="v060-build-day-progress" aria-hidden="true">
+            <span style={{ width: `${(activityIndex / activeActivities.length) * 100}%` }} />
+          </div>
+        </header>
+
+        <BuildActivityPlayer
+          key={activeActivity.id}
+          activity={activeActivity}
+          mode={mode}
+          presentation={buildPresentation(mode, (activeDay - 1) * 3 + activityIndex, activeDay)}
+          onExit={exitDay}
+          onComplete={(score) => completeActivity(activeActivity, score)}
+        />
+      </main>
+    )
+  }
+
+  const unlockedDays = Array.from({ length: 48 }, (_, index) => index + 1)
+    .filter((day) => buildDayUnlocked(day))
+
+  return (
+    <main className="v060-build-hub">
+      <section className="v060-build-hub-head">
+        <span className="v060-kicker">BUILD</span>
+        <h1>Build what you learned.</h1>
+        <p>SELECTを完了したDayだけが解放されます。1 Day = 3 BUILD Activitiesです。</p>
+      </section>
+
+      <details className="v060-build-settings">
+        <summary>Practice settings · {modeCopy[mode]}</summary>
+        <div>
+          {(Object.keys(modeCopy) as BuildMode[]).map((id) => (
+            <button
+              type="button"
+              key={id}
+              className={mode === id ? 'active' : ''}
+              onClick={() => changeMode(id)}
+            >
+              {modeCopy[id]}
+            </button>
+          ))}
+        </div>
+      </details>
+
+      <section className="v060-build-ready-days">
+        {chapterMeta.map((chapter) => {
+          const firstDay = (chapter.id - 1) * 6 + 1
+          const days = Array.from({ length: 6 }, (_, offset) => firstDay + offset)
+          const visible = days.filter((day) => DEBUG_UNLOCK_ALL_DAYS || unlockedDays.includes(day))
+          if (!visible.length) return null
+
+          return (
+            <section key={chapter.id} className="v060-build-chapter-block">
+              <div className="v060-build-chapter-head">
+                <span>CHAPTER {chapter.id}</span>
+                <strong>{chapter.title}</strong>
+              </div>
+              <div className="v060-build-day-grid">
+                {visible.map((day) => {
+                  const done = dayBuildCompleted(day, progress)
+                  const meta = level2BuildDayMeta.find((item) => item.day === day)
+                  return (
+                    <button
+                      type="button"
+                      key={day}
+                      className={`v060-build-day-tile ${done === 3 ? 'complete' : ''}`}
+                      onClick={() => openDay(day)}
+                    >
+                      <span>DAY {day}</span>
+                      <strong>{meta?.title ?? `Build Day ${day}`}</strong>
+                      <small>{done === 3 ? '✓ Complete · Replay' : done > 0 ? `${done}/3 · Resume` : '3 Activities · Start'}</small>
+                    </button>
+                  )
+                })}
+              </div>
+            </section>
+          )
+        })}
+      </section>
+
+      {!unlockedDays.length && (
+        <section className="v060-build-empty">
+          <strong>Complete a SELECT Shift first.</strong>
+          <p>SELECT Day 1を終えると、BUILD Day 1がここに解放されます。</p>
+          <button className="v060-primary-cta" onClick={() => onNavigate('home')}>Go to Today</button>
+        </section>
+      )}
+    </main>
+  )
 }

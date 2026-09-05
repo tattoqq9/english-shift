@@ -1,0 +1,212 @@
+/* v0.6.0 Phase 4 — final shell polish.
+   This file intentionally loads last and only normalizes the v0.6 shell. */
+
+html {
+  min-width: 320px;
+  background: var(--v060-canvas);
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.app-shell-v060 {
+  overflow-x: clip;
+}
+
+.app-shell-v060 button,
+.app-shell-v060 summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.app-shell-v060 button {
+  touch-action: manipulation;
+}
+
+.v060-brand,
+.v060-brand > span:last-child,
+.v060-page-intro > div,
+.v060-more-row > span,
+.v060-store-shift-copy,
+.v060-review-next-focus > div {
+  min-width: 0;
+}
+
+.v060-more-v4 .v060-page-intro {
+  margin-bottom: 18px;
+}
+
+.v060-more-section + .v060-more-section {
+  margin-top: 22px;
+}
+
+.v060-more-section-head {
+  margin: 0 3px 8px;
+  display: grid;
+  gap: 2px;
+}
+
+.v060-more-section-head small {
+  color: var(--v060-muted);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.v060-more-section-head strong {
+  color: var(--v060-ink);
+  font-size: 14px;
+}
+
+.v060-more-v4 .v060-more-list {
+  border-radius: 18px;
+}
+
+.v060-more-v4 .v060-more-row {
+  min-height: 80px;
+  padding: 14px 16px;
+}
+
+.v060-more-v4 .v060-more-row strong {
+  font-size: 14px;
+}
+
+.v060-more-v4 .v060-more-row p {
+  max-width: 680px;
+  font-size: 12px;
+}
+
+.v060-more-v4 .v060-more-row em {
+  color: var(--v060-muted);
+}
+
+.v060-more-v4 button.v060-more-row em {
+  color: var(--v060-brand);
+}
+
+@media (max-width: 720px) {
+  .v060-topbar.detail .v060-topbar-inner {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  .v060-topbar.detail .v060-brand {
+    min-width: 0;
+    max-width: 58%;
+  }
+
+  .v060-topbar.detail .v060-brand-mark {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
+  .v060-topbar.detail .v060-brand > span:last-child {
+    overflow: hidden;
+  }
+
+  .v060-topbar.detail .v060-brand > span:last-child small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .v060-context-back {
+    max-width: 42%;
+    min-height: 42px;
+    padding: 8px 10px;
+    gap: 6px;
+    font-size: 12px;
+  }
+
+  .v060-context-back > span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .v060-hub-main,
+  .v060-store-detail,
+  .v060-shift-intro,
+  .v060-shift-complete,
+  .v060-build-hub,
+  .v060-build-day-session,
+  .v060-build-day-complete,
+  .v060-review-session {
+    max-width: 100%;
+  }
+
+  .v060-primary-cta,
+  .v060-secondary-cta {
+    min-height: 50px;
+  }
+
+  .v060-more-v4 .v060-more-row {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 430px) {
+  .v060-topbar-inner {
+    padding-inline: 12px;
+  }
+
+  .v060-brand-mark {
+    width: 35px;
+    height: 35px;
+  }
+
+  .v060-hub-main {
+    width: calc(100% - 24px);
+  }
+
+  .v060-page-intro h1 {
+    font-size: 28px;
+  }
+
+  .v060-page-intro p {
+    font-size: 13px;
+  }
+
+  .v060-primary-nav-mobile {
+    padding-inline: 5px;
+  }
+
+  .v060-primary-nav-mobile button {
+    font-size: 10px;
+  }
+
+  .v060-more-v4 .v060-more-row {
+    min-height: 76px;
+    padding: 12px 13px;
+  }
+
+  .v060-more-v4 .v060-more-row p {
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 360px) {
+  .v060-topbar.detail .v060-brand {
+    max-width: 54%;
+  }
+
+  .v060-context-back {
+    max-width: 46%;
+    padding-inline: 8px;
+  }
+
+  .v060-primary-nav-mobile button {
+    font-size: 9.5px;
+  }
+
+  .v060-more-v4 .v060-more-row {
+    align-items: flex-start;
+  }
+
+  .v060-more-v4 .v060-more-row em {
+    padding-top: 2px;
+    font-size: 10px;
+  }
+}
