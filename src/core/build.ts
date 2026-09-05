@@ -29,6 +29,7 @@ export interface BuildActivity {
   title: string
   skill: string
   store: string
+  customerId: string
   customerName: string
   customerOpening: string
   customerOpeningJa: string

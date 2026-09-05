@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { CustomerPortrait } from './CustomerPortrait'
 import type { BuildActivity, BuildMode, BuildPresentation } from '../core/build'
 import { assembleBuildSentence, scoreBuild } from '../core/build'
 import { canCheckChangedAnswer, canRevealBestAnswer } from '../core/learningInteraction'
@@ -26,6 +27,23 @@ type Props = {
 
 const PRESENTATION_LABEL: Record<BuildPresentation, string> = { guided: 'STRUCTURE SLOTS', semi: 'SEMI-GUIDED', free: 'FREE BUILD' }
 
+
+function buildCustomerReaction(
+  resolved: boolean,
+  revealed: boolean,
+  checkLabel: 'Correct' | 'Almost' | 'Not quite' | null,
+  score?: number,
+) {
+  if (resolved) {
+    if (revealed) return { emotion: 'thinking' as const, motion: 'tilt' as const }
+    if ((score ?? 0) >= 95) return { emotion: 'delighted' as const, motion: 'pop' as const }
+    return { emotion: 'happy' as const, motion: 'nod' as const }
+  }
+  if (checkLabel === 'Almost') return { emotion: 'thinking' as const, motion: 'tilt' as const }
+  if (checkLabel === 'Not quite') return { emotion: 'confused' as const, motion: 'shake' as const }
+  return { emotion: 'neutral' as const, motion: 'idle' as const }
+}
+
 export function BuildActivityPlayer({ activity, mode, presentation, onComplete, onExit }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
   const [attempts, setAttempts] = useState(0)
@@ -47,6 +65,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   const canCheck = canCheckChangedAnswer(currentSignature, lastCheckedSignature)
   const canReveal = canRevealBestAnswer(attempts, hintsUsed, 3)
   const finalScore = resolved ? scoreBuild(activity, selectedIds, attempts, hintsUsed, revealed) : null
+  const customerReaction = buildCustomerReaction(resolved, revealed, checkLabel, finalScore?.score)
 
   const selectChunk = (id: string) => {
     if (resolved || selectedIds.length >= activity.targetChunkIds.length + 1) return
@@ -110,7 +129,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
         </div>
         <div className="build-scene-body">
           <div className="build-mission-head"><div><span>DAY {activity.day} · ACTIVITY {activity.activityNo} · {PRESENTATION_LABEL[presentation]} · {mode.toUpperCase()}</span><h2>{activity.title}</h2></div><div className="build-grammar-chips">{activity.grammarTargets.map((ref) => <span key={ref.key}>{grammarRegistryByKey.get(ref.key)?.labelJa ?? ref.key}</span>)}</div></div>
-          <div className="build-customer-row"><div className="build-customer-label"><span>👤</span><strong>{activity.customerName}</strong><small>CUSTOMER</small></div><div className="build-opening-card"><strong>“{activity.customerOpening}”</strong><button className="jp-toggle" onClick={() => setShowOpeningJa((value) => !value)}><span>🇯🇵</span>{showOpeningJa ? '日本語を隠す' : '日本語を見る'}</button>{showOpeningJa && <div className="jp-reveal">{activity.customerOpeningJa}</div>}</div></div>
+          <div className="build-customer-row"><div className="build-customer-identity"><CustomerPortrait customerId={activity.customerId} customerName={activity.customerName} emotion={customerReaction.emotion} motion={customerReaction.motion} reactionTick={attempts + (resolved ? 100 : 0)} /><div className="build-customer-label"><strong>{activity.customerName}</strong><small>CUSTOMER</small></div></div><div className="build-opening-card"><strong>“{activity.customerOpening}”</strong><button className="jp-toggle" onClick={() => setShowOpeningJa((value) => !value)}><span>🇯🇵</span>{showOpeningJa ? '日本語を隠す' : '日本語を見る'}</button>{showOpeningJa && <div className="jp-reveal">{activity.customerOpeningJa}</div>}</div></div>
           <div className="build-intent-card"><span>YOUR INTENT</span><strong>{activity.intentJa}</strong></div>
         </div>
       </section>

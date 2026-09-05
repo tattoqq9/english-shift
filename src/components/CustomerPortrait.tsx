@@ -1,6 +1,13 @@
 import type { CustomerEmotion, CustomerMotion } from '../core/reactions'
 
-const illustratedCustomers = new Set(['mia', 'daniel', 'grace'])
+const illustratedCustomers = new Set(['mia', 'sofia', 'leo', 'oliver', 'aisha', 'noah', 'ken', 'daniel', 'hana', 'grace', 'young-customer'])
+
+function sceneIcon(customerId: string) {
+  if (customerId === 'scene-exam') return '📄'
+  if (customerId === 'scene-incident') return '🧩'
+  if (customerId === 'scene-queue') return '👥'
+  return null
+}
 
 type CustomerPortraitProps = {
   customerId: string
@@ -19,6 +26,7 @@ export function CustomerPortrait({
   reactionTick,
   variant = 'header',
 }: CustomerPortraitProps) {
+  const icon = sceneIcon(customerId)
   const hasPortrait = illustratedCustomers.has(customerId)
   const animationKey = `${customerId}-${emotion}-${motion}-${reactionTick}`
 
@@ -26,9 +34,11 @@ export function CustomerPortrait({
     <div
       className={`customer-portrait customer-portrait-${variant} motion-${motion}`}
       key={animationKey}
-      aria-label={`${customerName}: ${emotion}`}
+      aria-label={icon ? customerName : `${customerName}: ${emotion}`}
     >
-      {hasPortrait ? (
+      {icon ? (
+        <div className="portrait-fallback portrait-scene" aria-hidden="true">{icon}</div>
+      ) : hasPortrait ? (
         <img
           src={`/characters/${customerId}/${emotion}.webp`}
           alt={`${customerName} reacting: ${emotion}`}

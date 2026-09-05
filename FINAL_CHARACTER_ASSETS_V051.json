@@ -1,0 +1,262 @@
+{
+  "version": "v0.5.1",
+  "purpose": "Replace the 8 new character portraits with the final Mia-scale shoulder-framed assets.",
+  "characters": {
+    "sofia": {
+      "neutral": {
+        "source": "sofia.png",
+        "sha256": "f0a7ff51715c1920d4a15ca23efcd5f88506132dace9af8f521aae82188f972a",
+        "bytes": 17030
+      },
+      "thinking": {
+        "source": "考え込むソフィアのポートレート.png",
+        "sha256": "df08c3f0cc5344fe5ceff3228d6c7e23cc3f8ca688e47674748b91cb9fd4477d",
+        "bytes": 16158
+      },
+      "happy": {
+        "source": "温かな笑顔のソフィア_恒一.png",
+        "sha256": "022b5c8830882fa517f156cd5e124aa3e0b60a8f365a3aa28e48d0a89a729d84",
+        "bytes": 16188
+      },
+      "confused": {
+        "source": "戸惑う少女のアニメ風肖像.png",
+        "sha256": "bae84ce069a7af0d25c7a329e05213555af0b2660f90a3702de65bcc2c40302c",
+        "bytes": 16636
+      },
+      "delighted": {
+        "source": "笑顔で応援するソフィア.png",
+        "sha256": "26a72da646153a1231bfb32c0fcc92d7369701e567cba89afc847a72ab61997a",
+        "bytes": 17246
+      },
+      "disappointed": {
+        "source": "物憂げなソフィアの肖像.png",
+        "sha256": "c31bac525f428e73fe9fb11013cf10825bf0ed3a58d9b7092c1bc0f17107dbc2",
+        "bytes": 16550
+      }
+    },
+    "leo": {
+      "neutral": {
+        "source": "leo.png",
+        "sha256": "59c6531fa2ab1eb98487b18825e42309c7d5447323583dd7ef1c5cdedf5b2d0d",
+        "bytes": 16428
+      },
+      "thinking": {
+        "source": "物思いにふける青年ポートレート.png",
+        "sha256": "70fa72c8f130aab0773608b1174f45a7c6b025bb50cbc0e7f465469177db3890",
+        "bytes": 16424
+      },
+      "happy": {
+        "source": "陽気なアニメ系クリエイター青年.png",
+        "sha256": "1d92014199e81ba85167ca61962604f7022ecb39f54db94db02913cab2e8fe49",
+        "bytes": 16226
+      },
+      "confused": {
+        "source": "困惑顔の青年とヘッドホン.png",
+        "sha256": "184abe8c6457f0fb06ceb917be1f79d76ea77dda702665596cc0cdefd66fff52",
+        "bytes": 15716
+      },
+      "delighted": {
+        "source": "元気いっぱいのヘッドホン少年.png",
+        "sha256": "5a05bc8b255a32d21d16d2efaac5e89f1d62eddf3d4f92ebf1a75492235c5bc9",
+        "bytes": 18050
+      },
+      "disappointed": {
+        "source": "物憂げな少年とヘッドホン.png",
+        "sha256": "e7be94fa5a5b8953eb9906182be53fd8554cc448985b4a4d11d4f5e3fa9dffff",
+        "bytes": 16342
+      }
+    },
+    "oliver": {
+      "neutral": {
+        "source": "oliver.png",
+        "sha256": "db8687974655ce915424d31982de6d6241abeea2d5e349b3453c8b1f4c5fdcad",
+        "bytes": 17724
+      },
+      "thinking": {
+        "source": "思索する青年のアニメ肖像.png",
+        "sha256": "b00566c6367e32680488c9ac26de69223d99b8083effa71c50175380445bac6e",
+        "bytes": 18186
+      },
+      "happy": {
+        "source": "穏やかに微笑む青年ポートレート.png",
+        "sha256": "4582ff3df4718c58560044c21cb20115f9848a08dded8d3f08c3df0ecdc4c175",
+        "bytes": 17634
+      },
+      "confused": {
+        "source": "戸惑いのオリバー_秋色の肖像.png",
+        "sha256": "7f7d8457119533bfceef9ddb8956716cd935e4211ebedfd494839284d006938d",
+        "bytes": 17392
+      },
+      "delighted": {
+        "source": "元気いっぱいの笑顔とガッツポーズ.png",
+        "sha256": "74be4a8c37ff6c009d1164f3fce6525ea670b39eb08aa231ef8b434d488ceb2d",
+        "bytes": 18354
+      },
+      "disappointed": {
+        "source": "物憂げな青年のアニメ肖像.png",
+        "sha256": "680e0a13f55aee6b87e52e91590dadce5a2b8afd63a757cd91ce410b3c5bcbd8",
+        "bytes": 17382
+      }
+    },
+    "aisha": {
+      "neutral": {
+        "source": "aisha.png",
+        "sha256": "12c8cda27521fc21d5355fd73b70e10598c52f636ff3cb60d4523ddbd9363964",
+        "bytes": 17540
+      },
+      "thinking": {
+        "source": "考え込むスポーティーな女性.png",
+        "sha256": "c19773a7390cc37db42aabd6e08aaa90dbde42d03e247ccd82689560498d10dc",
+        "bytes": 16576
+      },
+      "happy": {
+        "source": "スポーティーな笑顔のアニメ少女.png",
+        "sha256": "878ea8f18ac250638086e0b9f0e25aaed85c30cb0360738b6c06c2bc0a2f1291",
+        "bytes": 15682
+      },
+      "confused": {
+        "source": "困惑したカールヘアのスポーツ少女.png",
+        "sha256": "087b772f6936f25ea17511f7d841a8ca85ab6e555f3c7c6dbce3fd664e1cd592",
+        "bytes": 15862
+      },
+      "delighted": {
+        "source": "元気いっぱいの黒髪カール少女.png",
+        "sha256": "b96344d3441043d1ec5bf528a6b3a9389211fb80a6df33decc57c30942f4c32d",
+        "bytes": 16694
+      },
+      "disappointed": {
+        "source": "憂い顔のカーリーヘア女性アニメ肖像.png",
+        "sha256": "5a0521b0aaced188c23fd0387dbba96e40c05e73aa67f874544f463346af9fa7",
+        "bytes": 15544
+      }
+    },
+    "noah": {
+      "neutral": {
+        "source": "noah.png",
+        "sha256": "08fb7740e0bebd70a169439738cb8bf20c5bb758d9425355391e75040a9e7252",
+        "bytes": 17642
+      },
+      "thinking": {
+        "source": "考え込むアウトドア青年ノア.png",
+        "sha256": "2c3d270c768cd70429e66a9c900e13d13e6122c750de8952d17d14f42d11c0be",
+        "bytes": 17310
+      },
+      "happy": {
+        "source": "笑顔のノア_冒険ジャケット姿.png",
+        "sha256": "4da26cbe30265f9da2faf8dc02af57498db03544f3cc6abee1274f439216bee9",
+        "bytes": 16596
+      },
+      "confused": {
+        "source": "困惑したノアのアニメ風ポートレート.png",
+        "sha256": "89c9e8fb3836a0ab9bd1f702d5613d936f27ccb22ce86ebcb7b715c7b4dc24e9",
+        "bytes": 16498
+      },
+      "delighted": {
+        "source": "歓喜のガッツポーズ登山青年.png",
+        "sha256": "5a4c5ff6d3d3da0080c917f99fc52ec8aa8126782d9c7da8a05aecdbc2b4affc",
+        "bytes": 17574
+      },
+      "disappointed": {
+        "source": "物憂げな旅人の肖像.png",
+        "sha256": "39edbe393379ed79307ac542ce9c4972067c6291f6c1dc75775e360078b6bca9",
+        "bytes": 16664
+      }
+    },
+    "ken": {
+      "neutral": {
+        "source": "眼鏡の青年_穏やかな微笑み.png",
+        "sha256": "647387d7e1f82dc383f14bfa31d35fe216b1330535d9a20b388f8af4e9d3a5f5",
+        "bytes": 12328
+      },
+      "thinking": {
+        "source": "眼鏡の青年_思索のひととき.png",
+        "sha256": "ca9a30930d241b1503e07a7455e2c9c00b3f9e181b15ebc1fceb20b5efccf579",
+        "bytes": 13512
+      },
+      "happy": {
+        "source": "優しい笑顔の眼鏡青年.png",
+        "sha256": "f571dea7ff4f98669a4292d0b6a544fdadf8de7ff2d5202e966bc24a7c37fb73",
+        "bytes": 12720
+      },
+      "confused": {
+        "source": "困惑顔の眼鏡男子.png",
+        "sha256": "e732bdf35d86d6e0d4427f692d774bea14390f316590134ebc265271091bff72",
+        "bytes": 12614
+      },
+      "delighted": {
+        "source": "眼鏡の青年_喜びのガッツポーズ.png",
+        "sha256": "50a624cd138a32db27e4fa4ed713cfdd3f9b3048e8b10cea7f0cdae769630a86",
+        "bytes": 13614
+      },
+      "disappointed": {
+        "source": "物憂げな青年の肖像.png",
+        "sha256": "d62b6c0fb8c1a40ef6690932e2b3210b46ae3ee5031c06487b90bbeaa7998d81",
+        "bytes": 12470
+      }
+    },
+    "hana": {
+      "neutral": {
+        "source": "穏やかに微笑む若手女性の肖像.png",
+        "sha256": "2095e343b0568eec9f6427f256a08786ede5e11bf5402bc8cf3eacf36ec9d16f",
+        "bytes": 14854
+      },
+      "thinking": {
+        "source": "物思いにふける女性のポートレート.png",
+        "sha256": "f25a0f43dd51ad02735a40861df42341e6848f784b9541cc57371428016029e0",
+        "bytes": 15718
+      },
+      "happy": {
+        "source": "笑顔のシックなビジネススタイル女性.png",
+        "sha256": "1dfb84b9f62b6d3f5906b525e8b78ea108ce1b3eacaec12fcba68e230eb6c0dd",
+        "bytes": 15006
+      },
+      "confused": {
+        "source": "困惑した花のアニメ肖像.png",
+        "sha256": "ba16d4e0d411055beeea06f2277aa3b5e62d6d3f3b2da0cc28f0569f1322d3e1",
+        "bytes": 14894
+      },
+      "delighted": {
+        "source": "笑顔で励ます働く女性_vega.png",
+        "sha256": "6efcc948b9d8f5bacf124b7b2fdd3768c80992a8202e60090d18623319ae33a4",
+        "bytes": 15756
+      },
+      "disappointed": {
+        "source": "憂いを帯びた花の肖像.png",
+        "sha256": "59685dbf7b0f01389e1e7a4f732989d57c41267774db14914433385e380b80bb",
+        "bytes": 14938
+      }
+    },
+    "young-customer": {
+      "neutral": {
+        "source": "young customer(1).png",
+        "sha256": "2323698619ecbc5bc9c5bbbda071b095ed60549e5bfeb2ede24457bda167e3cc",
+        "bytes": 16852
+      },
+      "thinking": {
+        "source": "考え中の少女と柔らかな光.png",
+        "sha256": "95de550251830466a7cadda74ea28e224f468ddfab2bf9c1b45733eb57fb4804",
+        "bytes": 16954
+      },
+      "happy": {
+        "source": "笑顔でリュックを握る少女.png",
+        "sha256": "bffb4fe4a4cb831177d52879ef9b3779a9fb3fe29db039bb9880c8b025309f49",
+        "bytes": 17536
+      },
+      "confused": {
+        "source": "心配そうな少女のアニメポートレート.png",
+        "sha256": "b83f3c74aa7498c2e0cba446f19b09547f79d3a6fd007c1e3276c6277c505e1b",
+        "bytes": 15624
+      },
+      "delighted": {
+        "source": "きらめく笑顔のツインテール少女.png",
+        "sha256": "e259f23a8888b9686f301dbf4efb2582b7bd500b6207832ba824e8c14d006806",
+        "bytes": 18350
+      },
+      "disappointed": {
+        "source": "うつむく少女の切ない表情.png",
+        "sha256": "42ea4dda65f8272c964f4087bee51e8ec3fa116e45b53dea09575327bbd47283",
+        "bytes": 17228
+      }
+    }
+  }
+}

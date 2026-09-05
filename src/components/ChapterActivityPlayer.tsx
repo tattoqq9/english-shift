@@ -21,6 +21,7 @@ import {
 } from '../core/chapter1'
 import { japaneseFor } from '../data/japaneseSupport'
 import { grammarTargetsForActivity } from '../data/grammarRuntime'
+import { rapidScenarioCharacter } from '../data/characterRegistry'
 import { recordMasteryAttempt } from '../core/mastery'
 
 type CompleteHandler = (score: number, japaneseHintsUsed: number) => void
@@ -842,6 +843,7 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
   const tracker = useTranslationTracker()
   const scenario = activity.scenarios[index]
   const result = finished ? scoreRapid(activity, selectedIds) : null
+  const scenarioCharacter = rapidScenarioCharacter(activity.id, index)
 
   useEffect(() => { if (result) scrollToResult() }, [finished])
 
@@ -854,7 +856,8 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
 
   const reviewEntries: ReviewEntry[] = []
   activity.scenarios.forEach((item, scenarioIndex) => {
-    reviewEntries.push({ label: `CUSTOMER ${scenarioIndex + 1}`, english: item.line })
+    const miniCustomer = rapidScenarioCharacter(activity.id, scenarioIndex)
+    reviewEntries.push({ label: `${miniCustomer.name.toUpperCase()} · ${item.customer}`, english: item.line })
     const selected = item.choices.find((choice) => choice.id === selectedIds[scenarioIndex])
     if (selected) reviewEntries.push({ label: 'YOUR CHOICE', english: selected.text })
   })
@@ -865,8 +868,9 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
       <div className="chapter-objective"><strong>Goal</strong><span>{activity.objective}</span></div>
       {selectedIds.length > 0 && <SceneDialogue turns={activity.scenarios.slice(0, selectedIds.length).flatMap((item, scenarioIndex) => {
         const selected = item.choices.find((choice) => choice.id === selectedIds[scenarioIndex])
+        const miniCustomer = rapidScenarioCharacter(activity.id, scenarioIndex)
         return selected ? [
-          { speaker: 'customer' as const, label: item.customer, text: item.line },
+          { speaker: 'customer' as const, label: miniCustomer.name, text: item.line },
           { speaker: 'you' as const, label: 'YOU', text: selected.text },
           { speaker: 'customer' as const, label: item.customer, text: selected.response },
         ] : []
@@ -878,7 +882,10 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
           </div>
         <div className="chapter-rush-card visual-queue-current">
           <div className="chapter-rush-progress">Customer {index + 1}/{activity.scenarios.length}</div>
-          <h3>{scenario.customer}</h3>
+          <div className="rapid-mini-customer">
+            <CustomerPortrait customerId={scenarioCharacter.id} customerName={scenarioCharacter.name} emotion="neutral" motion="idle" reactionTick={index} />
+            <div className="rapid-mini-customer-copy"><span>CUSTOMER</span><h3>{scenarioCharacter.name}</h3><small>{scenario.customer}</small></div>
+          </div>
           <div className="chapter-opening">“{scenario.line}”</div>
           <TranslationHelp id={`${activity.id}:scenario:${scenario.id}:line`} english={scenario.line} tracker={tracker} />
           <div className="chapter-choice-list compact">
@@ -899,7 +906,7 @@ function RapidActivity({ activity, onComplete }: { activity: Chapter1RapidActivi
             const chosen = item.choices.find((choice) => choice.id === selectedIds[scenarioIndex])
             const best = bestChoice(item.choices)
             return {
-              label: `${item.customer}: ${item.line}`,
+              label: `${rapidScenarioCharacter(activity.id, scenarioIndex).name}: ${item.line}`,
               yourAnswer: chosen?.text ?? 'No answer',
               correctAnswer: best.text,
               isCorrect: chosen?.id === best.id,

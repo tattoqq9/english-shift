@@ -12,6 +12,7 @@ import { chapter8Activities, chapter8Days } from './chapter8.js'
 import { grammarTargetsForActivity } from './grammarRuntime.js'
 import { grammarRegistry, grammarRegistryByKey } from './grammarRegistry.js'
 import { japaneseFor } from './japaneseSupport.js'
+import './characterRuntime.js'
 
 const STORE_BY_CHAPTER: Record<BuildChapter, string> = {
   1: 'Convenience Store', 2: 'Clothing Store', 3: 'Sports / Outdoor Store', 4: 'Electronics Store',
@@ -571,7 +572,7 @@ function toBuildActivity(activity: Chapter1Activity, globalIndex: number): Build
   const day = dayFromId(activity.id); const activityNo = activityNoFromIndex(globalIndex); const target = targetFromActivity(activity)
   const buildId = `build-${activity.id}`; const parts = splitIntoChunks(buildId, target.sentence); const bank = makeChunkBank(buildId, parts); const grammarTargets = grammarForBuild(activity, target.sentence); const override = TARGET_OVERRIDES[activity.id]; const response = override?.response ? { response: override.response, responseJa: override.responseJa ?? japaneseFor(override.response) ?? override.response } : responseCopy(activity.kind, target.response)
   const labels = slotLabels(parts, grammarTargets)
-  return { id: `build-${activity.id}`, sourceActivityId: activity.id, chapter, day, activityNo, title: activity.title, skill: activity.skill, store: STORE_BY_CHAPTER[chapter], customerName: activity.customer.name, customerOpening: activity.customer.opening, customerOpeningJa: japaneseFor(activity.customer.opening) ?? activity.customer.opening, intentJa: activity.objective, targetSentence: target.sentence, targetJapanese: override?.targetJapanese ?? japaneseFor(target.sentence) ?? target.sentence, customerResponse: response.response, customerResponseJa: response.responseJa, grammarTargets, chunks: bank.chunks, targetChunkIds: bank.targetChunkIds, slotLabels: labels, hintsJa: buildHints(grammarTargets, parts, labels), bestRoute: ['Customerの状況とYOUR INTENTから、返答の目的を一つに絞る。', grammarLearningTip(grammarTargets), `文を${parts.length}個の意味chunkに分けて、英語として自然な順番に並べる。`] }
+  return { id: `build-${activity.id}`, sourceActivityId: activity.id, chapter, day, activityNo, title: activity.title, skill: activity.skill, store: STORE_BY_CHAPTER[chapter], customerId: activity.customer.id, customerName: activity.customer.name, customerOpening: activity.customer.opening, customerOpeningJa: japaneseFor(activity.customer.opening) ?? activity.customer.opening, intentJa: activity.objective, targetSentence: target.sentence, targetJapanese: override?.targetJapanese ?? japaneseFor(target.sentence) ?? target.sentence, customerResponse: response.response, customerResponseJa: response.responseJa, grammarTargets, chunks: bank.chunks, targetChunkIds: bank.targetChunkIds, slotLabels: labels, hintsJa: buildHints(grammarTargets, parts, labels), bestRoute: ['Customerの状況とYOUR INTENTから、返答の目的を一つに絞る。', grammarLearningTip(grammarTargets), `文を${parts.length}個の意味chunkに分けて、英語として自然な順番に並べる。`] }
 }
 
 const sourceActivities: Chapter1Activity[] = [...chapter1Activities, ...chapter2Activities, ...chapter3Activities, ...chapter4Activities, ...chapter5Activities, ...chapter6Activities, ...chapter7Activities, ...chapter8Activities]

@@ -31,9 +31,9 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
         </article>
         <article className="more-card info">
           <span>RELEASE</span>
-          <strong>v0.4.9 · Mobile Polish</strong>
-          <p>Androidの戻る操作、Safe Area、長文折り返し、主要ボタンのタップ領域をリリース向けに調整しています。</p>
-          <em>Release UX pass</em>
+          <strong>v0.5.1 · Characters & Context</strong>
+          <p>11人のRecurring Castを6表情で統一し、SELECTとBUILDで同じ人物を継承。Rapid / Queueも対応中のCustomerを個別表示し、人物設定に合わせて教材文を同期調整しました。</p>
+          <em>Character integration pass</em>
         </article>
         {DEBUG_UNLOCK_ALL_DAYS && (
           <article className="more-card debug">

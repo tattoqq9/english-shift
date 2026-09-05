@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.5.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "typecheck": "tsc -b",
-    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js && node .core-build/scripts/onboarding-smoke.js && node .core-build/scripts/release-ux-smoke.js && node .core-build/scripts/learning-interaction-smoke.js && node .core-build/scripts/release-candidate-smoke.js",
+    "core:check": "tsc -p tsconfig.core.json && node .core-build/scripts/core-smoke.js && node .core-build/scripts/mastery-smoke.js && node .core-build/scripts/review-smoke.js && node .core-build/scripts/onboarding-smoke.js && node .core-build/scripts/release-ux-smoke.js && node .core-build/scripts/learning-interaction-smoke.js && node .core-build/scripts/release-candidate-smoke.js && node .core-build/scripts/character-foundation-smoke.js && node .core-build/scripts/character-integration-smoke.js",
     "grammar:audit": "tsc -p tsconfig.core.json && node .core-build/scripts/grammar-audit.js",
     "mastery:check": "tsc -p tsconfig.core.json && node .core-build/scripts/mastery-smoke.js",
     "review:check": "tsc -p tsconfig.core.json && node .core-build/scripts/review-smoke.js",
@@ -24,7 +24,12 @@
     "version:sync": "node scripts/sync-package-lock-version.mjs",
     "interaction:check": "tsc -p tsconfig.core.json && node .core-build/scripts/learning-interaction-smoke.js",
     "rc:smoke": "tsc -p tsconfig.core.json && node .core-build/scripts/release-candidate-smoke.js",
-    "rc:check": "npm run version:sync && npm run typecheck && npm run core:check && npm run build:check && npm run nav:check && npm run advanced:check && npm run level2:quality && npm run grammar:audit && npm run build"
+    "character:check": "tsc -p tsconfig.core.json && node .core-build/scripts/character-foundation-smoke.js && node .core-build/scripts/character-integration-smoke.js && node scripts/character-assets-smoke.mjs",
+    "rc:check": "npm run version:sync && npm run typecheck && npm run core:check && npm run character:assets && npm run build:check && npm run nav:check && npm run advanced:check && npm run level2:quality && npm run grammar:audit && npm run build",
+    "character:assets": "node scripts/character-assets-smoke.mjs",
+    "character:integration": "tsc -p tsconfig.core.json && node .core-build/scripts/character-integration-smoke.js",
+    "v051:smoke": "node scripts/v051-release-smoke.mjs",
+    "v051:check": "npm run version:sync && npm run v051:smoke && npm run rc:check"
   },
   "dependencies": {
     "react": "^19.2.7",

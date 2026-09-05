@@ -1,0 +1,46 @@
+/* English Shift v0.5.1 — Character content integration */
+.build-customer-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: min(250px, 38%);
+}
+.build-customer-identity .build-customer-label {
+  min-width: 0;
+}
+.build-customer-identity .build-customer-label strong,
+.rapid-mini-customer-copy strong {
+  overflow-wrap: anywhere;
+}
+
+.rapid-mini-customer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 12px;
+}
+.rapid-mini-customer .customer-portrait-header {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+}
+.rapid-mini-customer-copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.rapid-mini-customer-copy span,
+.rapid-mini-customer-copy small {
+  color: #747a76;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.rapid-mini-customer-copy span { text-transform: uppercase; }
+.rapid-mini-customer-copy h3 { margin: 0; }
+
+@media (max-width: 640px) {
+  .build-customer-identity { min-width: 0; width: 100%; }
+  .build-customer-identity .customer-portrait-header { width: 76px; height: 76px; border-radius: 19px; }
+  .rapid-mini-customer .customer-portrait-header { width: 64px; height: 64px; border-radius: 16px; }
+}
