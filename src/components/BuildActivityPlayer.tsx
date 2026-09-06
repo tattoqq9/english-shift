@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { CustomerPortrait } from './CustomerPortrait'
 import type { BuildActivity, BuildMode, BuildPresentation } from '../core/build'
 import { assembleBuildSentence, scoreBuild } from '../core/build'
+import { freeBuildSignature, scoreFreeBuild } from '../core/freeBuild'
 import { canCheckChangedAnswer, canRevealBestAnswer } from '../core/learningInteraction'
 import { grammarRegistryByKey } from '../data/grammarRegistry'
 import { recordMasteryAttempt } from '../core/mastery'
@@ -47,6 +48,7 @@ function buildCustomerReaction(
 
 export function BuildActivityPlayer({ activity, mode, presentation, onComplete, onExit }: Props) {
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [freeText, setFreeText] = useState('')
   const [attempts, setAttempts] = useState(0)
   const [hintsUsed, setHintsUsed] = useState(0)
   const [hintTexts, setHintTexts] = useState<string[]>([])
@@ -60,12 +62,20 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   const recorded = useRef(false)
   const scene = SCENE[activity.chapter]
 
-  const selectedSentence = useMemo(() => assembleBuildSentence(activity, selectedIds), [activity, selectedIds])
-  const currentSignature = selectedIds.join('|')
-  const available = activity.chunks.filter((chunk) => !selectedIds.includes(chunk.id))
+  const isFreeInput = presentation === 'free'
+  const selectedSentence = useMemo(
+    () => isFreeInput ? freeText.trim() : assembleBuildSentence(activity, selectedIds),
+    [activity, selectedIds, freeText, isFreeInput],
+  )
+  const currentSignature = isFreeInput ? freeBuildSignature(freeText) : selectedIds.join('|')
+  const available = isFreeInput ? [] : activity.chunks.filter((chunk) => !selectedIds.includes(chunk.id))
   const canCheck = canCheckChangedAnswer(currentSignature, lastCheckedSignature)
   const canReveal = canRevealBestAnswer(attempts, hintsUsed, 3)
-  const finalScore = resolved ? scoreBuild(activity, selectedIds, attempts, hintsUsed, revealed) : null
+  const finalScore = resolved
+    ? isFreeInput
+      ? scoreFreeBuild(activity, revealed ? activity.targetSentence : freeText, attempts, hintsUsed, revealed)
+      : scoreBuild(activity, selectedIds, attempts, hintsUsed, revealed)
+    : null
   const customerReaction = buildCustomerReaction(resolved, revealed, checkLabel, finalScore?.score)
 
   const selectChunk = (id: string) => {
@@ -84,7 +94,9 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
     const nextAttempts = attempts + 1
     setAttempts(nextAttempts)
     setLastCheckedSignature(currentSignature)
-    const result = scoreBuild(activity, selectedIds, nextAttempts, hintsUsed)
+    const result = isFreeInput
+      ? scoreFreeBuild(activity, freeText, nextAttempts, hintsUsed)
+      : scoreBuild(activity, selectedIds, nextAttempts, hintsUsed)
     playGameFeel(result.check, window.localStorage)
     setLastCheckedSentence(selectedSentence)
     setFeedback(result.feedback)
@@ -110,9 +122,12 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
   const revealAnswer = () => {
     if (!canReveal || resolved) return
     if (selectedSentence) setLastCheckedSentence(selectedSentence)
-    setSelectedIds(activity.targetChunkIds)
+    if (isFreeInput) setFreeText(activity.targetSentence)
+    else setSelectedIds(activity.targetChunkIds)
     setRevealed(true); setResolved(true); setCheckLabel(null)
-    const result = scoreBuild(activity, activity.targetChunkIds, attempts, hintsUsed, true)
+    const result = isFreeInput
+      ? scoreFreeBuild(activity, activity.targetSentence, attempts, hintsUsed, true)
+      : scoreBuild(activity, activity.targetChunkIds, attempts, hintsUsed, true)
     setFeedback(result.feedback)
     if (!recorded.current) {
       recorded.current = true
@@ -138,32 +153,61 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
 
       {!resolved ? (
         <section className="build-workbench">
-          <div className="build-workbench-head"><div><span>ASSEMBLE YOUR RESPONSE</span><strong>{presentation === 'guided' ? '文の役割を見ながら組み立てる' : presentation === 'semi' ? 'スロットだけを手がかりに組み立てる' : '自力で自然な語順を作る'}</strong></div></div>
+          <div className="build-workbench-head"><div><span>ASSEMBLE YOUR RESPONSE</span><strong>{presentation === 'guided' ? '文の役割を見ながら組み立てる' : presentation === 'semi' ? 'スロットだけを手がかりに組み立てる' : '英語を自分で入力して返答を作る'}</strong></div></div>
 
-          {presentation !== 'free' ? <div className={`build-slot-tray ${presentation}`}>
-            {slots.map((id, index) => {
-              const chunk = id ? activity.chunks.find((item) => item.id === id) : null
-              return <button key={index} className={chunk ? 'filled' : ''} onClick={() => chunk && removeAt(index)} disabled={!chunk}>
-                {presentation === 'guided' && <small>{activity.slotLabels?.[index] ?? `PART ${index + 1}`}</small>}
-                <strong>{chunk?.text ?? `Slot ${index + 1}`}</strong>
-              </button>
-            })}
-          </div> : <div className={`build-sentence-tray ${selectedIds.length ? 'has-chunks' : ''}`}>
-            {selectedIds.length === 0 ? <span className="build-placeholder">下のchunkをタップして英文を組み立ててください。</span> : selectedIds.map((id, index) => { const chunk = activity.chunks.find((item) => item.id === id)!; return <button key={`${id}-${index}`} onClick={() => removeAt(index)}>{chunk.text}</button> })}
-          </div>}
+          {isFreeInput ? (
+            <div className="v065-free-build-editor">
+              <label htmlFor={`free-build-${activity.id}`}>TYPE YOUR RESPONSE</label>
+              <textarea
+                id={`free-build-${activity.id}`}
+                value={freeText}
+                maxLength={320}
+                rows={4}
+                autoCapitalize="sentences"
+                autoCorrect="on"
+                spellCheck
+                placeholder="Type your response in English."
+                onChange={(event) => {
+                  if (resolved) return
+                  setFreeText(event.target.value)
+                  setFeedback(null)
+                  setCheckLabel(null)
+                }}
+              />
+              <div className="v065-free-build-meta">
+                <span>{freeText.trim() ? freeText.trim().split(/\s+/).length : 0} words</span>
+                <span>大文字小文字・末尾句読点・一般的な短縮形は同一として判定</span>
+              </div>
+              <p className="v065-free-build-policy">
+                <strong>Free BUILD</strong> · 自然な言い換えを推測で正解にはしません。typoや小さな文法差はAlmostとして返します。
+              </p>
+            </div>
+          ) : (
+            <div className={`build-slot-tray ${presentation}`}>
+              {slots.map((id, index) => {
+                const chunk = id ? activity.chunks.find((item) => item.id === id) : null
+                return <button key={index} className={chunk ? 'filled' : ''} onClick={() => chunk && removeAt(index)} disabled={!chunk}>
+                  {presentation === 'guided' && <small>{activity.slotLabels?.[index] ?? `PART ${index + 1}`}</small>}
+                  <strong>{chunk?.text ?? `Slot ${index + 1}`}</strong>
+                </button>
+              })}
+            </div>
+          )}
 
           {selectedSentence && <div className="build-sentence-preview"><span>YOUR SENTENCE</span><strong>{selectedSentence}</strong></div>}
-          <div className="build-chunk-bank">{available.map((chunk) => <button key={chunk.id} onClick={() => selectChunk(chunk.id)}>{chunk.text}</button>)}</div>
+          {!isFreeInput && <div className="build-chunk-bank">{available.map((chunk) => <button key={chunk.id} onClick={() => selectChunk(chunk.id)}>{chunk.text}</button>)}</div>}
 
           {hintTexts.length > 0 && <div className="build-hint-stack">{hintTexts.map((text, index) => <div className="build-hint-note" key={`${index}-${text}`}><strong>HINT {index + 1}</strong><span>{text}</span></div>)}</div>}
           {feedback && <div className={`build-feedback-note ${checkLabel === 'Almost' ? 'almost' : checkLabel === 'Correct' ? 'correct' : 'not-quite'}`}><strong>{checkLabel === 'Correct' ? 'Correct · 正解' : checkLabel === 'Almost' ? 'Almost · あと少し' : 'Not quite · もう一度'}</strong><span>{feedback}</span></div>}
           <div className="build-actions">
-            <button className="secondary-button" onClick={() => { setSelectedIds([]); setFeedback(null); setCheckLabel(null) }} disabled={!selectedIds.length}>Clear</button>
+            <button className="secondary-button" onClick={() => { if (isFreeInput) setFreeText(''); else setSelectedIds([]); setFeedback(null); setCheckLabel(null) }} disabled={isFreeInput ? !freeText.trim() : !selectedIds.length}>Clear</button>
             <button className="secondary-button" onClick={showHint} disabled={hintsUsed >= 3}>Hint {Math.min(hintsUsed + 1, 3)} / 3</button>
             <button className="primary" onClick={checkSentence} disabled={!canCheck}>Check my sentence</button>
           </div>
-          {!selectedIds.length ? (
-            <p className="build-check-helper">フレーズを選ぶとチェックできます。最初から難しいときはHintを使えます。</p>
+          {!selectedSentence ? (
+            <p className="build-check-helper">
+              {isFreeInput ? '英文を入力するとチェックできます。最初から難しいときはHintを使えます。' : 'フレーズを選ぶとチェックできます。最初から難しいときはHintを使えます。'}
+            </p>
           ) : !canCheck ? (
             <p className="learning-support-note"><strong>同じ回答は再チェックしません。</strong> 回答を変えると再チェックできます。HintやBest answerで確認することもできます。</p>
           ) : attempts > 0 ? (
@@ -180,7 +224,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
         <section className="build-result-card">
           <div className="build-result-head"><div><span>BUILD RESULT</span><h2>{finalScore.score} / 100</h2></div><strong className={finalScore.score >= 82 ? 'build-result-pass' : 'build-result-retry'}>{revealed ? 'REVIEW' : 'SUCCESS'}</strong></div>
           <div className="build-result-grid"><div><span>Checks</span><strong>{finalScore.attempts}</strong></div><div><span>Hints</span><strong>{hintsUsed}</strong></div><div><span>Mode</span><strong>{PRESENTATION_LABEL[presentation]}</strong></div></div>
-          {lastCheckedSentence && lastCheckedSentence !== activity.targetSentence && <div className="build-last-try-review"><span>YOUR LAST TRY</span><strong>{lastCheckedSentence}</strong></div>}
+          {lastCheckedSentence && (isFreeInput || lastCheckedSentence !== activity.targetSentence) && <div className={`build-last-try-review ${isFreeInput ? 'v065-your-response' : ''}`}><span>{isFreeInput ? 'YOUR RESPONSE' : 'YOUR LAST TRY'}</span><strong>{lastCheckedSentence}</strong></div>}
           <div className="build-answer-review"><span>BEST RESPONSE</span><strong>{activity.targetSentence}</strong><p>{activity.targetJapanese}</p></div>
           <div className="build-structure-review"><span>STRUCTURE MAP</span><div>{activity.targetChunkIds.map((id, index) => { const chunk = activity.chunks.find((item) => item.id === id); return <div key={id}><small>{activity.slotLabels?.[index] ?? `PART ${index + 1}`}</small><strong>{chunk?.text}</strong></div> })}</div></div>
           <div className="build-why-review"><span>WHY?</span><div className="build-grammar-chips">{activity.grammarTargets.map((ref) => <span key={ref.key}>{grammarRegistryByKey.get(ref.key)?.labelJa ?? ref.key}</span>)}</div><ol>{activity.bestRoute.map((item) => <li key={item}>{item}</li>)}</ol></div>

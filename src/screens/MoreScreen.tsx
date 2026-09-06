@@ -130,8 +130,8 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.4 · Customer Collection</strong>
-              <p>11人のCustomer Book、Collection Badges、Store REGULAR / MASTERを追加。学習構造と既存進捗schemaは維持。</p>
+              <strong>v0.6.5 · Free BUILD Production</strong>
+              <p>Standard後半とChallengeを本当の自由入力BUILDへ移行。端末内の保守的判定でCorrect / Almost / Not quiteを返します。</p>
             </span>
             <em>RC prep</em>
           </article>

@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.6.4",
+  "version": "0.6.5",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -55,7 +55,12 @@
     "v064:collection:core": "tsc -p tsconfig.core.json && node .core-build/scripts/v064-collection-smoke.js",
     "v064:collection:ui": "node scripts/v064-collection-ui-smoke.mjs",
     "v064:check": "npm run v064:collection:core && npm run v064:collection:ui",
-    "v064:release": "npm run version:sync && npm run v064:check && npm run rc:check"
+    "v064:release": "npm run version:sync && npm run v064:check && npm run rc:check",
+    "v065:freebuild:core": "tsc -p tsconfig.core.json && node .core-build/scripts/v065-free-build-smoke.js",
+    "v065:freebuild:ui": "node scripts/v065-free-build-ui-smoke.mjs",
+    "v065:check": "npm run v065:freebuild:core && npm run v065:freebuild:ui && npm run v065:r5:smoke && npm run v064:check",
+    "v065:release": "npm run version:sync && npm run v065:check && npm run rc:check",
+    "v065:r5:smoke": "node scripts/v065-r5-session-mode-smoke.mjs"
   },
   "dependencies": {
     "react": "^19.2.7",

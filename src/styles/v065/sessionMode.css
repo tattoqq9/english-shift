@@ -1,0 +1,91 @@
+.v065-session-mode-panel {
+  display: grid;
+  gap: 9px;
+  margin: 12px auto 14px;
+  width: min(100%, 960px);
+  padding: 12px 14px;
+  box-sizing: border-box;
+  border: 1px solid #e4ded3;
+  border-radius: 15px;
+  background: #fbfaf7;
+}
+
+.v065-session-mode-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.v065-session-mode-head span {
+  color: #887e71;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+
+.v065-session-mode-head strong {
+  color: #34463b;
+  font-size: 12px;
+}
+
+.v065-session-mode-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.v065-session-mode-buttons button {
+  min-height: 40px;
+  padding: 8px 9px;
+  border: 1px solid #d9d3c8;
+  border-radius: 11px;
+  background: #fff;
+  color: #655e55;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.v065-session-mode-buttons button.active {
+  border-color: #718d7b;
+  background: #eef5f0;
+  color: #294737;
+  box-shadow: 0 0 0 2px rgba(86, 126, 100, .08);
+}
+
+.v065-session-mode-copy {
+  margin: 0;
+  color: #786f64;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.v065-session-mode-copy strong {
+  color: #405248;
+}
+
+@media (max-width: 520px) {
+  .v065-session-mode-panel {
+    margin: 8px 12px 12px;
+    width: auto;
+    padding: 11px;
+  }
+
+  .v065-session-mode-buttons {
+    gap: 6px;
+  }
+
+  .v065-session-mode-buttons button {
+    min-height: 42px;
+    padding: 7px 5px;
+    font-size: 10px;
+  }
+
+  .v065-session-mode-head {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+}

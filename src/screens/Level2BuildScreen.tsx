@@ -192,8 +192,48 @@ export function Level2BuildScreen({ onNavigate }: Props) {
           </div>
         </header>
 
+        <section className="v065-session-mode-panel" aria-label="BUILD practice mode">
+          <div className="v065-session-mode-head">
+            <span>PRACTICE MODE</span>
+            <strong>{modeCopy[mode]} · {
+              mode === 'guided'
+                ? 'Structure Slots'
+                : mode === 'challenge'
+                  ? 'Free typing'
+                  : activeDay >= 31
+                    ? 'Free typing'
+                    : activeDay >= 13
+                      ? 'Semi-guided chunks'
+                      : 'Structure Slots'
+            }</strong>
+          </div>
+          <div className="v065-session-mode-buttons">
+            {(Object.keys(modeCopy) as BuildMode[]).map((id) => (
+              <button
+                type="button"
+                key={id}
+                className={mode === id ? 'active' : ''}
+                onClick={() => changeMode(id)}
+              >
+                {modeCopy[id]}
+              </button>
+            ))}
+          </div>
+          <p className="v065-session-mode-copy">
+            {mode === 'guided'
+              ? 'Guidedは全Dayでchunk + Structure Slotです。'
+              : mode === 'challenge'
+                ? 'Challengeは全Dayでキーボード自由入力です。'
+                : activeDay >= 31
+                  ? <><strong>Standard Day 31–48</strong> はキーボード自由入力です。</>
+                  : activeDay >= 13
+                    ? 'Standard Day 13–30はSemi-guided chunkです。'
+                    : 'Standard Day 1–12はStructure Slotです。'}
+          </p>
+        </section>
+
         <BuildActivityPlayer
-          key={activeActivity.id}
+          key={activeActivity.id + '-' + mode}
           activity={activeActivity}
           mode={mode}
           presentation={buildPresentation(mode, (activeDay - 1) * 3 + activityIndex, activeDay)}
@@ -229,6 +269,9 @@ export function Level2BuildScreen({ onNavigate }: Props) {
             </button>
           ))}
         </div>
+        <p className="v065-build-mode-note">
+          <strong>Standard</strong>: Day 31以降は自由入力 · <strong>Challenge</strong>: 全Dayを自由入力 · <strong>Guided</strong>: Structure Slotを維持
+        </p>
       </details>
 
       <section className="v060-build-ready-days">

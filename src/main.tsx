@@ -20,6 +20,8 @@ import './styles/v062/retention.css'
 import './styles/v063/audioAtmosphere.css'
 import './styles/v062/buildReadability.css'
 import './styles/v064/collection.css'
+import './styles/v065/freeBuild.css'
+import './styles/v065/sessionMode.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
