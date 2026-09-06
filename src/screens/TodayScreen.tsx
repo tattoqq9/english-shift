@@ -8,6 +8,7 @@ import { queueBuildDayLaunch, completedSelectDays } from '../core/buildDayFlow'
 import { readBuildProgress } from '../core/build'
 import { level2BuildActivities } from '../data/level2BuildActivities'
 import { HabitProgressCard } from '../components/HabitProgressCard'
+import { CollectionProgressCard } from '../components/CollectionProgressCard'
 
 const CHAPTER_GUIDES: Record<number, { id: string; name: string }> = {
   1: { id: 'mia', name: 'Mia' },
@@ -148,6 +149,8 @@ export function TodayScreen({ onNavigate }: Props) {
       </section>
 
       <HabitProgressCard />
+
+      <CollectionProgressCard onOpen={() => onNavigate('more')} />
 
       <section className="v060-quick-section" aria-label="Quick review">
         <div>

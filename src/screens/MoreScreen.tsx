@@ -3,6 +3,7 @@ import type { AppView } from '../App'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 import { playGameFeel, readGameFeelSettings, saveGameFeelSettings, type GameFeelSettings } from '../core/gameFeel'
 import { previewStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
+import { CustomerBook } from '../components/CustomerBook'
 
 export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void }) {
   const [gameFeel, setGameFeel] = useState(() => readGameFeelSettings(window.localStorage))
@@ -26,10 +27,12 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
       <section className="v060-page-intro">
         <div>
           <span className="v060-kicker">MORE</span>
-          <h1>Optional tools</h1>
-          <p>毎日の学習に必須ではない機能と情報だけをまとめています。</p>
+          <h1>Collection & extras</h1>
+          <p>Customer Book、設定、追加トレーニングなど、学習を続ける楽しみをまとめています。</p>
         </div>
       </section>
+
+      <CustomerBook />
 
       <section className="v060-more-section">
         <div className="v060-more-section-head">
@@ -127,8 +130,8 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.3 · Audio Atmosphere</strong>
-              <p>8店舗の低音量BGM・環境音、SE ducking、Music設定を追加。学習構造と進捗schemaは維持。</p>
+              <strong>v0.6.4 · Customer Collection</strong>
+              <p>11人のCustomer Book、Collection Badges、Store REGULAR / MASTERを追加。学習構造と既存進捗schemaは維持。</p>
             </span>
             <em>RC prep</em>
           </article>

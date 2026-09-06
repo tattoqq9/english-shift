@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.6.3",
+  "version": "0.6.4",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -51,7 +51,11 @@
     "v063:tuning:check": "npm run v063:tuning:smoke && npm run v063:check",
     "v063:tuning:release": "npm run version:sync && npm run v063:tuning:check && npm run build",
     "v063:quietmix:smoke": "node scripts/v063-quiet-mix-smoke.mjs",
-    "v063:quietmix:release": "npm run version:sync && npm run v063:quietmix:smoke && npm run v063:check && npm run build"
+    "v063:quietmix:release": "npm run version:sync && npm run v063:quietmix:smoke && npm run v063:check && npm run build",
+    "v064:collection:core": "tsc -p tsconfig.core.json && node .core-build/scripts/v064-collection-smoke.js",
+    "v064:collection:ui": "node scripts/v064-collection-ui-smoke.mjs",
+    "v064:check": "npm run v064:collection:core && npm run v064:collection:ui",
+    "v064:release": "npm run version:sync && npm run v064:check && npm run rc:check"
   },
   "dependencies": {
     "react": "^19.2.7",

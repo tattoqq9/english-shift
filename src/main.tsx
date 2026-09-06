@@ -19,6 +19,7 @@ import './styles/v061/gameFeel.css'
 import './styles/v062/retention.css'
 import './styles/v063/audioAtmosphere.css'
 import './styles/v062/buildReadability.css'
+import './styles/v064/collection.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
