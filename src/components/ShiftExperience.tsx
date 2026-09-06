@@ -1,3 +1,9 @@
+import { useEffect } from 'react'
+import { readBuildProgress } from '../core/build'
+import { playGameFeel, primeGameFeelAudio, readGameFeelSettings } from '../core/gameFeel'
+import { level2BuildActivities } from '../data/level2BuildActivities'
+import { ShiftPassportStrip, type PassportStamp } from './ShiftPassportStrip'
+
 type ShiftDay = {
   day: number
   title: string
@@ -34,6 +40,27 @@ const STORE_META: Record<number, { title: string; background: string; position: 
   6: { title: 'Hotel', background: '/backgrounds/chapter-6-hotel.webp', position: 'center 31%' },
   7: { title: 'Department Store', background: '/backgrounds/chapter-7-department.webp', position: 'center 28%' },
   8: { title: 'International Flagship', background: '/backgrounds/chapter-8-flagship.webp', position: 'center 31%' },
+}
+
+function passportForStore(chapterId: number, currentDay: number): PassportStamp[] {
+  const firstDay = (chapterId - 1) * 6 + 1
+  const selectDays = new Set<number>([currentDay])
+  try {
+    const raw = window.localStorage.getItem(`english-shift-chapter${chapterId}-progress-v1`)
+    const parsed = raw ? JSON.parse(raw) as { completedDays?: unknown } : null
+    if (Array.isArray(parsed?.completedDays)) {
+      for (const day of parsed.completedDays) if (typeof day === 'number') selectDays.add(day)
+    }
+  } catch { /* keep the current completed Shift visible even if stored progress is damaged */ }
+
+  const build = readBuildProgress(window.localStorage)
+  const completedBuild = new Set(build.completedIds)
+
+  return Array.from({ length: 6 }, (_, offset) => firstDay + offset).map((day) => {
+    const buildActivities = level2BuildActivities.filter((activity) => activity.day === day)
+    const paired = buildActivities.length === 3 && buildActivities.every((activity) => completedBuild.has(activity.id))
+    return { day, status: paired ? 'paired' : selectDays.has(day) ? 'select' : 'empty' }
+  })
 }
 
 function sessionMinutes(activityCount: number) {
@@ -75,7 +102,14 @@ export function ShiftIntro({ chapterId, day, onStart, onBack }: IntroProps) {
             {day.canDo.length > 1 && <small>＋ {day.canDo.length - 1} more</small>}
           </section>
 
-          <button type="button" className="v060-primary-cta v060-shift-start" onClick={onStart}>
+          <button
+            type="button"
+            className="v060-primary-cta v060-shift-start"
+            onClick={() => {
+              primeGameFeelAudio()
+              onStart()
+            }}
+          >
             Start Shift
           </button>
         </div>
@@ -89,9 +123,15 @@ export function ShiftDayResult({ chapterId, day, scores, hintCounts, onFinish, o
   const total = scores.reduce((sum, value) => sum + value, 0)
   const percent = scores.length ? Math.round(total / scores.length) : 0
   const hintsUsed = hintCounts.reduce((sum, value) => sum + value, 0)
+  const gameFeel = readGameFeelSettings(window.localStorage)
+  const passport = passportForStore(chapterId, day.day)
+
+  useEffect(() => {
+    playGameFeel('shift_complete', window.localStorage)
+  }, [])
 
   return (
-    <main className="v060-shift-complete">
+    <main className={`v060-shift-complete ${gameFeel.celebrations ? 'v061-celebrate' : ''}`}>
       <section className="v060-shift-complete-card">
         <div className="v060-shift-complete-mark" aria-hidden="true">✓</div>
         <span className="v060-kicker">SHIFT COMPLETE</span>
@@ -104,6 +144,8 @@ export function ShiftDayResult({ chapterId, day, scores, hintCounts, onFinish, o
           <div><span>Hints</span><strong>{hintsUsed}</strong></div>
           <div><span>Best</span><strong>{scores.length ? `${Math.max(...scores)}%` : '—'}</strong></div>
         </div>
+
+        <ShiftPassportStrip storeTitle={store.title} stamps={passport} highlightDay={day.day} />
 
         <section className="v060-shift-learned">
           <span>YOU PRACTICED</span>

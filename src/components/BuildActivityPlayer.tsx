@@ -5,6 +5,7 @@ import { assembleBuildSentence, scoreBuild } from '../core/build'
 import { canCheckChangedAnswer, canRevealBestAnswer } from '../core/learningInteraction'
 import { grammarRegistryByKey } from '../data/grammarRegistry'
 import { recordMasteryAttempt } from '../core/mastery'
+import { playGameFeel } from '../core/gameFeel'
 
 const SCENE = {
   1: { background: '/backgrounds/chapter-1-convenience.webp', position: 'center 42%' },
@@ -84,6 +85,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
     setAttempts(nextAttempts)
     setLastCheckedSignature(currentSignature)
     const result = scoreBuild(activity, selectedIds, nextAttempts, hintsUsed)
+    playGameFeel(result.check, window.localStorage)
     setLastCheckedSentence(selectedSentence)
     setFeedback(result.feedback)
     setCheckLabel(result.check === 'correct' ? 'Correct' : result.check === 'almost' ? 'Almost' : 'Not quite')
@@ -129,7 +131,7 @@ export function BuildActivityPlayer({ activity, mode, presentation, onComplete, 
         </div>
         <div className="build-scene-body">
           <div className="build-mission-head"><div><span>DAY {activity.day} · ACTIVITY {activity.activityNo} · {PRESENTATION_LABEL[presentation]} · {mode.toUpperCase()}</span><h2>{activity.title}</h2></div><div className="build-grammar-chips">{activity.grammarTargets.map((ref) => <span key={ref.key}>{grammarRegistryByKey.get(ref.key)?.labelJa ?? ref.key}</span>)}</div></div>
-          <div className="build-customer-row"><div className="build-customer-identity"><CustomerPortrait customerId={activity.customerId} customerName={activity.customerName} emotion={customerReaction.emotion} motion={customerReaction.motion} reactionTick={attempts + (resolved ? 100 : 0)} /><div className="build-customer-label"><strong>{activity.customerName}</strong><small>CUSTOMER</small></div></div><div className="build-opening-card"><strong>“{activity.customerOpening}”</strong><button className="jp-toggle" onClick={() => setShowOpeningJa((value) => !value)}><span>🇯🇵</span>{showOpeningJa ? '日本語を隠す' : '日本語を見る'}</button>{showOpeningJa && <div className="jp-reveal">{activity.customerOpeningJa}</div>}</div></div>
+          <div className="build-customer-row"><div className="build-customer-identity"><CustomerPortrait customerId={activity.customerId} customerName={activity.customerName} emotion={customerReaction.emotion} motion={customerReaction.motion} reactionTick={attempts + (resolved ? 100 : 0)} /><div className="build-customer-label"><strong>{activity.customerName}</strong><small>CUSTOMER</small></div></div><div className="build-opening-card build-opening-card-readable"><span className="build-opening-speaker">CUSTOMER SAYS</span><strong>“{activity.customerOpening}”</strong><button className="jp-toggle" onClick={() => setShowOpeningJa((value) => !value)}><span>🇯🇵</span>{showOpeningJa ? '日本語を隠す' : '日本語を見る'}</button>{showOpeningJa && <div className="jp-reveal">{activity.customerOpeningJa}</div>}</div></div>
           <div className="build-intent-card"><span>YOUR INTENT</span><strong>{activity.intentJa}</strong></div>
         </div>
       </section>

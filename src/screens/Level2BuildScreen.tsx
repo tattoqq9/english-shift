@@ -16,6 +16,8 @@ import { clearBuildDayLaunch, isSelectDayComplete, readBuildDayLaunch } from '..
 import { chapterMeta } from '../core/navigationProgress'
 import { level2BuildActivities, level2BuildDayMeta } from '../data/level2BuildActivities'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
+import { playGameFeel, readGameFeelSettings } from '../core/gameFeel'
+import { ShiftPassportStrip, type PassportStamp } from '../components/ShiftPassportStrip'
 
 type Props = {
   onNavigate: (view: AppView) => void
@@ -36,6 +38,19 @@ function dayActivities(day: number) {
 function dayBuildCompleted(day: number, progress: BuildProgress) {
   const completed = new Set(progress.completedIds)
   return dayActivities(day).filter((activity) => completed.has(activity.id)).length
+}
+
+function passportForBuildDay(activeDay: number, progress: BuildProgress): PassportStamp[] {
+  const chapter = Math.ceil(activeDay / 6)
+  const firstDay = (chapter - 1) * 6 + 1
+  return Array.from({ length: 6 }, (_, offset) => firstDay + offset).map((day) => ({
+    day,
+    status: dayBuildCompleted(day, progress) === 3
+      ? 'paired'
+      : isSelectDayComplete(day, window.localStorage)
+        ? 'select'
+        : 'empty',
+  }))
 }
 
 function firstIncompleteIndex(day: number, progress: BuildProgress) {
@@ -98,6 +113,7 @@ export function Level2BuildScreen({ onNavigate }: Props) {
     if (activityIndex < activeActivities.length - 1) {
       setActivityIndex((index) => index + 1)
     } else {
+      playGameFeel('build_complete', window.localStorage)
       setDayFinished(true)
     }
     scrollTop()
@@ -117,9 +133,12 @@ export function Level2BuildScreen({ onNavigate }: Props) {
       ? Math.round(bestScores.reduce((sum, score) => sum + score, 0) / bestScores.length)
       : 0
     const meta = level2BuildDayMeta.find((item) => item.day === activeDay)
+    const store = chapterMeta[Math.ceil(activeDay / 6) - 1]
+    const passport = passportForBuildDay(activeDay, progress)
+    const gameFeel = readGameFeelSettings(window.localStorage)
 
     return (
-      <main className="v060-build-day-complete">
+      <main className={`v060-build-day-complete ${gameFeel.celebrations ? 'v061-celebrate' : ''}`}>
         <section className="v060-build-day-complete-card">
           <div className="v060-shift-complete-mark" aria-hidden="true">✓</div>
           <span className="v060-kicker">BUILD COMPLETE</span>
@@ -132,6 +151,8 @@ export function Level2BuildScreen({ onNavigate }: Props) {
             <div><span>Best avg.</span><strong>{bestAverage}%</strong></div>
             <div><span>Mode</span><strong>{modeCopy[mode]}</strong></div>
           </div>
+
+          <ShiftPassportStrip storeTitle={store?.title ?? 'Store'} stamps={passport} highlightDay={activeDay} />
 
           <button className="v060-primary-cta" onClick={() => onNavigate('home')}>
             Continue learning

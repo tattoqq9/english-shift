@@ -1,7 +1,19 @@
+import { useState } from 'react'
 import type { AppView } from '../App'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
+import { playGameFeel, readGameFeelSettings, saveGameFeelSettings, type GameFeelSettings } from '../core/gameFeel'
 
 export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void }) {
+  const [gameFeel, setGameFeel] = useState(() => readGameFeelSettings(window.localStorage))
+
+  const toggleGameFeel = (key: keyof GameFeelSettings) => {
+    const next = { ...gameFeel, [key]: !gameFeel[key] }
+    saveGameFeelSettings(next, window.localStorage)
+    setGameFeel(next)
+    if (key === 'soundFx' && next.soundFx) playGameFeel('correct', window.localStorage)
+    if (key === 'haptics' && next.haptics) playGameFeel('stamp', window.localStorage)
+  }
+
   return (
     <main className="v060-hub-main v060-more v060-more-v4">
       <section className="v060-page-intro">
@@ -10,6 +22,28 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <h1>Optional tools</h1>
           <p>毎日の学習に必須ではない機能と情報だけをまとめています。</p>
         </div>
+      </section>
+
+      <section className="v060-more-section">
+        <div className="v060-more-section-head">
+          <small>GAME FEEL</small>
+          <strong>Sound, haptics & celebration</strong>
+        </div>
+        <div className="v060-more-list v061-gamefeel-panel">
+          <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('soundFx')}>
+            <span><strong>Sound effects</strong><small>正解・惜しい・Shift完了を短いSEで返します。</small></span>
+            <span className={`v061-toggle ${gameFeel.soundFx ? 'on' : ''}`} aria-label={gameFeel.soundFx ? 'Sound effects on' : 'Sound effects off'} />
+          </button>
+          <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('haptics')}>
+            <span><strong>Haptics</strong><small>Correctでは軽く、Shift / BUILD Completeでは2〜3段で振動します。OFF→ONでもテストできます。</small></span>
+            <span className={`v061-toggle ${gameFeel.haptics ? 'on' : ''}`} aria-label={gameFeel.haptics ? 'Haptics on' : 'Haptics off'} />
+          </button>
+          <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('celebrations')}>
+            <span><strong>Celebration animation</strong><small>Shift / BUILD Completeで✓のPop、金色Glow、カードの浮き上がり、Passport stampを演出します。</small></span>
+            <span className={`v061-toggle ${gameFeel.celebrations ? 'on' : ''}`} aria-label={gameFeel.celebrations ? 'Celebration animation on' : 'Celebration animation off'} />
+          </button>
+        </div>
+        <p className="v061-audio-note">BGM / 店舗環境音は、曲調・ループ品質・音量設計を確定してから次段で追加します。</p>
       </section>
 
       <section className="v060-more-section">
@@ -73,8 +107,8 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.0 · UI/UX Reboot</strong>
-              <p>Today / Shifts / Reviewを中心に、学習導線・Shift体験・Result・Reviewを再設計。</p>
+              <strong>v0.6.1 · Game Feel Foundation</strong>
+              <p>v0.6.0の学習構造を維持したまま、SE・ハプティクス・完了演出・Shift Passportを追加。</p>
             </span>
             <em>RC prep</em>
           </article>

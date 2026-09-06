@@ -1,0 +1,370 @@
+/* v0.6.1 Game Feel & Retention Foundation
+   Pure presentation layer. No learning-progress schema is introduced here. */
+
+.v061-celebrate .v060-shift-complete-card,
+.v061-celebrate .v060-build-day-complete-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.v061-celebrate .v060-shift-complete-card::before,
+.v061-celebrate .v060-build-day-complete-card::before {
+  content: '';
+  position: absolute;
+  inset: -35% -20% auto;
+  height: 320px;
+  background: radial-gradient(circle, rgba(255, 214, 92, .22), rgba(255, 214, 92, 0) 68%);
+  pointer-events: none;
+  z-index: -1;
+  animation: v061-reward-glow 900ms ease-out both;
+}
+
+.v061-celebrate .v060-shift-complete-mark {
+  animation: v061-complete-pop 620ms cubic-bezier(.2, .9, .28, 1.25) both;
+}
+
+.v061-passport {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid rgba(79, 102, 130, .16);
+  border-radius: 18px;
+  background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(246,249,252,.94));
+  box-shadow: 0 12px 30px rgba(27, 43, 61, .06);
+}
+
+.v061-passport.mastered {
+  border-color: rgba(210, 157, 38, .34);
+  background: linear-gradient(145deg, rgba(255,252,239,.98), rgba(255,247,219,.94));
+}
+
+.v061-passport-head,
+.v061-passport-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.v061-passport-head span {
+  display: grid;
+  gap: 2px;
+}
+
+.v061-passport-head small {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .13em;
+  color: #738095;
+}
+
+.v061-passport-head strong {
+  font-size: 15px;
+  color: #182231;
+}
+
+.v061-passport-head em {
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 800;
+  color: #56657a;
+}
+
+.v061-passport-stamps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+  margin: 14px 0 12px;
+}
+
+.v061-passport-stamp {
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1px;
+  border: 1px dashed #cad3df;
+  border-radius: 999px;
+  color: #9ba6b4;
+  background: rgba(255,255,255,.72);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.v061-passport-stamp span {
+  font-size: clamp(17px, 4.5vw, 23px);
+  line-height: 1;
+  font-weight: 900;
+}
+
+.v061-passport-stamp small {
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: -.01em;
+}
+
+.v061-passport-stamp.select {
+  border-style: solid;
+  border-color: #8eb5dd;
+  color: #316da6;
+  background: #eef7ff;
+}
+
+.v061-passport-stamp.paired {
+  border-style: solid;
+  border-color: #e0ad43;
+  color: #875b00;
+  background: linear-gradient(145deg, #fff7d8, #ffeaa2);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.45);
+}
+
+.v061-passport-stamp.highlight {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 18px rgba(30, 69, 107, .13);
+}
+
+.v061-passport-legend {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  font-size: 9px;
+  color: #728096;
+}
+
+.v061-passport-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 800;
+}
+
+.v061-passport-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #8eb5dd;
+}
+
+.v061-passport-legend i.paired {
+  background: #e0ad43;
+}
+
+.v061-passport-legend strong {
+  margin-left: auto;
+  font-size: 9px;
+  color: #59677b;
+}
+
+.v061-gamefeel-panel {
+  padding: 4px 0;
+}
+
+.v061-gamefeel-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 15px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(84, 100, 119, .12);
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.v061-gamefeel-row:last-child {
+  border-bottom: 0;
+}
+
+.v061-gamefeel-row > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.v061-gamefeel-row strong {
+  font-size: 14px;
+}
+
+.v061-gamefeel-row small {
+  color: #7b8798;
+  line-height: 1.4;
+}
+
+.v061-toggle {
+  width: 48px;
+  height: 28px;
+  padding: 3px;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #d8dee7;
+  transition: background 180ms ease;
+}
+
+.v061-toggle::after {
+  content: '';
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 7px rgba(21, 34, 49, .2);
+  transition: transform 180ms ease;
+}
+
+.v061-toggle.on {
+  background: #276ea8;
+}
+
+.v061-toggle.on::after {
+  transform: translateX(20px);
+}
+
+.v061-audio-note {
+  margin: 12px 0 0;
+  color: #7a8797;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+@keyframes v061-complete-pop {
+  0% { transform: scale(.7) rotate(-8deg); opacity: 0; }
+  58% { transform: scale(1.12) rotate(3deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes v061-reward-glow {
+  from { opacity: 0; transform: scale(.78); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 430px) {
+  .v061-passport {
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .v061-passport-stamps {
+    gap: 5px;
+  }
+
+  .v061-passport-stamp small {
+    font-size: 7px;
+  }
+
+  .v061-passport-legend strong {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v061-celebrate .v060-shift-complete-card::before,
+  .v061-celebrate .v060-build-day-complete-card::before,
+  .v061-celebrate .v060-shift-complete-mark {
+    animation: none !important;
+  }
+
+  .v061-passport-stamp,
+  .v061-toggle,
+  .v061-toggle::after {
+    transition: none !important;
+  }
+}
+
+
+/* v0.6.1 tuning: clearer completion celebration */
+
+/* The foundation glow used a negative stacking layer, which could become
+   almost invisible against an opaque card. Keep the reward light above the
+   card background and below its content. */
+.v061-celebrate .v060-shift-complete-card::before,
+.v061-celebrate .v060-build-day-complete-card::before {
+  z-index: 0;
+  height: 390px;
+  background: radial-gradient(circle, rgba(255, 201, 55, .34), rgba(255, 223, 123, .12) 38%, rgba(255, 214, 92, 0) 70%);
+  animation: v061-reward-glow-strong 1050ms cubic-bezier(.2,.8,.25,1) both;
+}
+
+.v061-celebrate .v060-shift-complete-card > *,
+.v061-celebrate .v060-build-day-complete-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.v061-celebrate .v060-shift-complete-card,
+.v061-celebrate .v060-build-day-complete-card {
+  animation: v061-complete-card-arrive 720ms cubic-bezier(.2,.85,.28,1.12) both;
+}
+
+.v061-celebrate .v060-shift-complete-card::after,
+.v061-celebrate .v060-build-day-complete-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 14% 18%, rgba(255,190,46,.9) 0 3px, transparent 4px),
+    radial-gradient(circle at 83% 16%, rgba(255,218,98,.9) 0 3px, transparent 4px),
+    radial-gradient(circle at 91% 36%, rgba(255,190,46,.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 9% 45%, rgba(255,225,125,.75) 0 2px, transparent 3px),
+    radial-gradient(circle at 73% 8%, rgba(255,238,174,.9) 0 2px, transparent 3px),
+    radial-gradient(circle at 26% 9%, rgba(255,238,174,.85) 0 2px, transparent 3px);
+  animation: v061-reward-sparkles 1150ms ease-out 70ms both;
+}
+
+.v061-celebrate .v060-shift-complete-mark {
+  filter: drop-shadow(0 8px 18px rgba(207, 147, 18, .2));
+  animation: v061-complete-pop-strong 760ms cubic-bezier(.16,.9,.25,1.35) both;
+}
+
+.v061-celebrate .v061-passport-stamp.highlight {
+  animation: v061-stamp-land 820ms cubic-bezier(.18,.9,.25,1.28) 180ms both;
+}
+
+@keyframes v061-complete-card-arrive {
+  0% { transform: translateY(10px) scale(.985); opacity: .78; box-shadow: 0 8px 22px rgba(27,43,61,.08); }
+  65% { transform: translateY(-2px) scale(1.008); opacity: 1; box-shadow: 0 20px 46px rgba(185,132,24,.16); }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes v061-complete-pop-strong {
+  0% { transform: scale(.48) rotate(-12deg); opacity: 0; }
+  55% { transform: scale(1.22) rotate(4deg); opacity: 1; }
+  78% { transform: scale(.94) rotate(-1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@keyframes v061-reward-glow-strong {
+  0% { opacity: 0; transform: scale(.64); }
+  45% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: .78; transform: scale(1); }
+}
+
+@keyframes v061-reward-sparkles {
+  0% { opacity: 0; transform: scale(.84); }
+  35% { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.08); }
+}
+
+@keyframes v061-stamp-land {
+  0% { transform: translateY(-16px) scale(.72) rotate(-10deg); opacity: .25; }
+  55% { transform: translateY(2px) scale(1.15) rotate(3deg); opacity: 1; }
+  75% { transform: translateY(-1px) scale(.96) rotate(-1deg); }
+  100% { transform: translateY(-2px) scale(1.04) rotate(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v061-celebrate .v060-shift-complete-card,
+  .v061-celebrate .v060-build-day-complete-card,
+  .v061-celebrate .v060-shift-complete-card::before,
+  .v061-celebrate .v060-build-day-complete-card::before,
+  .v061-celebrate .v060-shift-complete-card::after,
+  .v061-celebrate .v060-build-day-complete-card::after,
+  .v061-celebrate .v060-shift-complete-mark,
+  .v061-celebrate .v061-passport-stamp.highlight {
+    animation: none !important;
+  }
+}

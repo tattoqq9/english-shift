@@ -15,6 +15,8 @@ import './styles/v060/storeDetail.css'
 import './styles/v060/shiftExperience.css'
 import './styles/v060/unifiedFlow.css'
 import './styles/v060/finalPolish.css'
+import './styles/v061/gameFeel.css'
+import './styles/v062/buildReadability.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

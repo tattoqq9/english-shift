@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -35,7 +35,12 @@
     "v060:rc:smoke": "node scripts/v060-rc-smoke.mjs",
     "v060:rc": "npm run version:sync && npm run v060:check && npm run v060:rc:smoke && npm run rc:check",
     "v060:release:smoke": "node scripts/v060-release-smoke.mjs",
-    "v060:release": "npm run version:sync && npm run v060:check && npm run v060:rc:smoke && npm run v060:release:smoke && npm run rc:check"
+    "v060:release": "npm run version:sync && npm run v060:check && npm run v060:rc:smoke && npm run v060:release:smoke && npm run rc:check",
+    "v061:gamefeel:smoke": "node scripts/v061-game-feel-smoke.mjs",
+    "v061:check": "npm run v061:gamefeel:smoke && npm run v060:check",
+    "v061:release": "npm run version:sync && npm run v061:check",
+    "v062a:r3:smoke": "node scripts/v062-build-readability-r3-smoke.mjs",
+    "v062a:r3:release": "npm run version:sync && npm run v062a:r3:smoke && npm run v061:check && npm run build"
   },
   "dependencies": {
     "react": "^19.2.7",
