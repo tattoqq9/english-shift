@@ -21,10 +21,28 @@ import { RepairLabScreen } from './screens/RepairLabScreen'
 import { FlowLabScreen } from './screens/FlowLabScreen'
 import { completeOnboarding, shouldShowOnboarding } from './core/onboarding'
 import { makeAppHistoryState, readAppHistoryView, type HistoryAppView } from './core/appHistory'
-import { queueShiftLaunch } from './core/shiftLaunch'
+import { queueShiftLaunch, readShiftLaunch } from './core/shiftLaunch'
+import { chapterForDay, readBuildDayLaunch } from './core/buildDayFlow'
+import { startStoreAtmosphere, stopStoreAtmosphere } from './core/audioAtmosphere'
 import { DEBUG_UNLOCK_ALL_DAYS } from './runtimeMode'
 
 export type AppView = HistoryAppView
+
+function queuedAtmosphereStore(next: AppView) {
+  try {
+    if (next === 'build') {
+      const day = readBuildDayLaunch(window.sessionStorage)
+      return day ? chapterForDay(day) : null
+    }
+    const match = /^chapter([1-8])$/.exec(next)
+    if (!match) return null
+    const chapterId = Number(match[1])
+    const request = readShiftLaunch(chapterId, window.sessionStorage)
+    return request?.autoStart ? chapterId : null
+  } catch {
+    return null
+  }
+}
 
 function initialView(): AppView {
   try {
@@ -56,6 +74,7 @@ export default function App() {
     const handlePopState = (event: PopStateEvent) => {
       const next = readAppHistoryView(event.state)
       if (!next) return
+      stopStoreAtmosphere(120)
       setOnboardingReturnView(null)
       setView(next)
       scrollTop('auto')
@@ -76,6 +95,10 @@ export default function App() {
       scrollTop()
       return
     }
+
+    const atmosphereStore = queuedAtmosphereStore(next)
+    if (atmosphereStore) startStoreAtmosphere(atmosphereStore, window.localStorage, next === 'build' ? 'build' : 'select')
+    else stopStoreAtmosphere(120)
 
     setView(next)
     try {

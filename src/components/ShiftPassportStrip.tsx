@@ -45,6 +45,13 @@ export function ShiftPassportStrip({ storeTitle, stamps, highlightDay }: Props) 
         ))}
       </div>
 
+      {mastered && (
+        <div className="v062-store-master-seal" aria-label="Store Master reward earned">
+          <span aria-hidden="true">★</span>
+          <div><strong>STORE MASTER</strong><small>6 / 6 SELECT + BUILD pairs complete</small></div>
+        </div>
+      )}
+
       <div className="v061-passport-legend">
         <span><i className="select" />SELECT</span>
         <span><i className="paired" />SELECT + BUILD</span>

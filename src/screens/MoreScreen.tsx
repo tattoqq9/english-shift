@@ -1,15 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { AppView } from '../App'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 import { playGameFeel, readGameFeelSettings, saveGameFeelSettings, type GameFeelSettings } from '../core/gameFeel'
+import { previewStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
 
 export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void }) {
   const [gameFeel, setGameFeel] = useState(() => readGameFeelSettings(window.localStorage))
+
+  useEffect(() => () => stopStoreAtmosphere(120), [])
 
   const toggleGameFeel = (key: keyof GameFeelSettings) => {
     const next = { ...gameFeel, [key]: !gameFeel[key] }
     saveGameFeelSettings(next, window.localStorage)
     setGameFeel(next)
+    if (key === 'music') {
+      if (next.music) previewStoreAtmosphere(1, window.localStorage)
+      else stopStoreAtmosphere(120)
+    }
     if (key === 'soundFx' && next.soundFx) playGameFeel('correct', window.localStorage)
     if (key === 'haptics' && next.haptics) playGameFeel('stamp', window.localStorage)
   }
@@ -30,20 +37,33 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <strong>Sound, haptics & celebration</strong>
         </div>
         <div className="v060-more-list v061-gamefeel-panel">
+          <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('music')}>
+            <span><strong>Music & ambience</strong><small>店舗ごとの低音量BGM。BUILD / REVIEWでは自動的にさらに静かになります。</small></span>
+            <span className={`v061-toggle ${gameFeel.music ? 'on' : ''}`} aria-label={gameFeel.music ? 'Music and ambience on' : 'Music and ambience off'} />
+          </button>
           <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('soundFx')}>
             <span><strong>Sound effects</strong><small>正解・惜しい・Shift完了を短いSEで返します。</small></span>
             <span className={`v061-toggle ${gameFeel.soundFx ? 'on' : ''}`} aria-label={gameFeel.soundFx ? 'Sound effects on' : 'Sound effects off'} />
           </button>
           <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('haptics')}>
-            <span><strong>Haptics</strong><small>Correctでは軽く、Shift / BUILD Completeでは2〜3段で振動します。OFF→ONでもテストできます。</small></span>
+            <span><strong>Haptics</strong><small>Correctでは軽く、Shift / BUILD Completeでは2〜3段で振動します。端末がサイレント設定では振動しない場合があります。</small></span>
             <span className={`v061-toggle ${gameFeel.haptics ? 'on' : ''}`} aria-label={gameFeel.haptics ? 'Haptics on' : 'Haptics off'} />
           </button>
           <button className="v061-gamefeel-row" type="button" onClick={() => toggleGameFeel('celebrations')}>
             <span><strong>Celebration animation</strong><small>Shift / BUILD Completeで✓のPop、金色Glow、カードの浮き上がり、Passport stampを演出します。</small></span>
             <span className={`v061-toggle ${gameFeel.celebrations ? 'on' : ''}`} aria-label={gameFeel.celebrations ? 'Celebration animation on' : 'Celebration animation off'} />
           </button>
+          <button
+            className="v063-audio-preview"
+            type="button"
+            disabled={!gameFeel.music}
+            onClick={() => previewStoreAtmosphere(1, window.localStorage)}
+          >
+            <span><strong>▶ Preview store atmosphere</strong><small>Convenience Store themeを約5秒だけ試聴します。</small></span>
+            <em>5 SEC</em>
+          </button>
         </div>
-        <p className="v061-audio-note">BGM / 店舗環境音は、曲調・ループ品質・音量設計を確定してから次段で追加します。</p>
+        <p className="v061-audio-note">8店舗の音はWeb Audioで生成。歌詞・会話音は使わず、20〜40秒ごとの小さな環境音とslow variationでループ感を抑えます。SE時は自動duckingします。</p>
       </section>
 
       <section className="v060-more-section">
@@ -107,8 +127,8 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.1 · Game Feel Foundation</strong>
-              <p>v0.6.0の学習構造を維持したまま、SE・ハプティクス・完了演出・Shift Passportを追加。</p>
+              <strong>v0.6.3 · Audio Atmosphere</strong>
+              <p>8店舗の低音量BGM・環境音、SE ducking、Music設定を追加。学習構造と進捗schemaは維持。</p>
             </span>
             <em>RC prep</em>
           </article>

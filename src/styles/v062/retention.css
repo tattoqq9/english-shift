@@ -1,0 +1,218 @@
+/* v0.6.2 Habit & Rewards
+   Habit state is isolated from curriculum progress and Mastery. */
+
+.v062-habit-card {
+  margin: 18px 0;
+  padding: 17px;
+  border: 1px solid rgba(73, 94, 119, .14);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(255,255,255,.98), rgba(246,249,252,.96));
+  box-shadow: 0 14px 34px rgba(28, 44, 64, .07);
+}
+
+.v062-habit-card.reward-earned {
+  border-color: rgba(209, 158, 40, .32);
+  background: linear-gradient(145deg, rgba(255,253,243,.99), rgba(255,247,220,.96));
+}
+
+.v062-habit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.v062-habit-head > span {
+  display: grid;
+  gap: 3px;
+}
+
+.v062-habit-head small,
+.v062-weekly-stamp-mini small {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .12em;
+  color: #778397;
+}
+
+.v062-habit-head > span strong {
+  font-size: 17px;
+  color: #182231;
+}
+
+.v062-weekly-stamp-mini {
+  min-width: 88px;
+  display: grid;
+  justify-items: end;
+  gap: 2px;
+}
+
+.v062-weekly-stamp-mini strong {
+  font-size: 18px;
+  color: #865a00;
+}
+
+.v062-week-days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin: 15px 0 11px;
+}
+
+.v062-week-days > div {
+  min-width: 0;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 7px 2px;
+  border-radius: 12px;
+  color: #909aaa;
+  background: rgba(236, 241, 246, .72);
+}
+
+.v062-week-days small {
+  font-size: 7px;
+  font-weight: 900;
+}
+
+.v062-week-days span {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 13px;
+  font-weight: 900;
+  background: rgba(255,255,255,.82);
+}
+
+.v062-week-days .active {
+  color: #25679e;
+  background: #edf7ff;
+}
+
+.v062-week-days .active span {
+  color: white;
+  background: #337db6;
+  box-shadow: 0 5px 12px rgba(46, 115, 168, .18);
+}
+
+.v062-week-days .today {
+  outline: 2px solid rgba(54, 125, 180, .2);
+  outline-offset: 1px;
+}
+
+.v062-week-progress {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e8edf3;
+}
+
+.v062-week-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #3b83bb, #e3ae42);
+  transition: width 360ms cubic-bezier(.2,.8,.28,1);
+}
+
+.v062-habit-reward-copy {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  color: #4e5d70;
+}
+
+.v062-habit-reward-copy > span:not(.v062-reward-seal) {
+  display: grid;
+  gap: 2px;
+}
+
+.v062-habit-reward-copy strong {
+  font-size: 12px;
+  color: #28374a;
+}
+
+.v062-habit-reward-copy small {
+  font-size: 10px;
+  line-height: 1.4;
+  color: #778498;
+}
+
+.v062-reward-seal {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 2px solid #d49b27;
+  border-radius: 50%;
+  color: #8b5d00;
+  background: linear-gradient(145deg, #fff3be, #ffe18a);
+  box-shadow: 0 7px 16px rgba(178, 121, 10, .16);
+}
+
+.v062-store-master-seal {
+  margin: 13px 0 2px;
+  padding: 11px 13px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(207, 150, 28, .35);
+  border-radius: 15px;
+  color: #785000;
+  background: linear-gradient(135deg, rgba(255,247,213,.96), rgba(255,230,149,.92));
+}
+
+.v062-store-master-seal > span {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 2px solid #c28b18;
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+}
+
+.v062-store-master-seal > div {
+  display: grid;
+  gap: 1px;
+}
+
+.v062-store-master-seal strong {
+  font-size: 12px;
+  letter-spacing: .04em;
+}
+
+.v062-store-master-seal small {
+  font-size: 9px;
+  color: #936a19;
+}
+
+.v061-celebrate .v062-store-master-seal {
+  animation: v062-master-stamp 900ms cubic-bezier(.16,.9,.25,1.25) 260ms both;
+}
+
+@keyframes v062-master-stamp {
+  0% { transform: scale(.72) rotate(-4deg); opacity: 0; }
+  58% { transform: scale(1.06) rotate(1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0); opacity: 1; }
+}
+
+@media (max-width: 430px) {
+  .v062-habit-card { padding: 15px 12px; border-radius: 18px; }
+  .v062-habit-head > span strong { font-size: 15px; }
+  .v062-weekly-stamp-mini { min-width: 76px; }
+  .v062-week-days { gap: 4px; }
+  .v062-week-days > div { padding: 6px 1px; border-radius: 10px; }
+  .v062-week-days span { width: 20px; height: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v062-week-progress > span,
+  .v061-celebrate .v062-store-master-seal { transition: none; animation: none !important; }
+}

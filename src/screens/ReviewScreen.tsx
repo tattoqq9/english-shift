@@ -17,6 +17,8 @@ import {
 import { repairActivities } from '../data/advancedTrainingActivities'
 import { grammarRegistry, grammarRegistryByKey } from '../data/grammarRegistry'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
+import { startStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
+import { recordRetentionSession } from '../core/retention'
 
 type Props = {
   onNavigate: (view: AppView) => void
@@ -90,6 +92,7 @@ export function ReviewScreen({ onNavigate }: Props) {
   const startReview = () => {
     const nextPlan = buildProgressAwareWeaknessReviewActivities(progress, 5, window.localStorage)
     if (!nextPlan.items.length) return
+    startStoreAtmosphere(6, window.localStorage, 'review')
     setActiveReview({
       items: nextPlan.items,
       focusRefs: nextPlan.focusRefs,
@@ -101,6 +104,10 @@ export function ReviewScreen({ onNavigate }: Props) {
   }
 
   const completeActivity = (score: number) => {
+    if (activeReview && reviewIndex === activeReview.items.length - 1) {
+      recordRetentionSession('review', window.localStorage)
+      stopStoreAtmosphere(180)
+    }
     setReviewScores((current) => [...current, score])
     setProgress(readMasteryProgress(window.localStorage))
     setReviewIndex((current) => current + 1)
@@ -108,6 +115,7 @@ export function ReviewScreen({ onNavigate }: Props) {
   }
 
   const leaveReview = () => {
+    stopStoreAtmosphere(180)
     setProgress(readMasteryProgress(window.localStorage))
     setActiveReview(null)
     setReviewIndex(0)

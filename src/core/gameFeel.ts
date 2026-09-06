@@ -1,3 +1,5 @@
+import { duckStoreAtmosphere } from './audioAtmosphere.js'
+
 export const GAME_FEEL_SETTINGS_KEY = 'english-shift-game-feel-v1'
 
 export type GameFeelEvent =
@@ -10,6 +12,7 @@ export type GameFeelEvent =
   | 'stamp'
 
 export type GameFeelSettings = {
+  music: boolean
   soundFx: boolean
   haptics: boolean
   celebrations: boolean
@@ -18,6 +21,7 @@ export type GameFeelSettings = {
 type SettingsStorage = Pick<Storage, 'getItem' | 'setItem'>
 
 export const DEFAULT_GAME_FEEL_SETTINGS: GameFeelSettings = {
+  music: true,
   soundFx: true,
   haptics: true,
   celebrations: true,
@@ -30,6 +34,7 @@ export function readGameFeelSettings(storage?: Pick<Storage, 'getItem'>): GameFe
     if (!raw) return DEFAULT_GAME_FEEL_SETTINGS
     const parsed = JSON.parse(raw) as Partial<GameFeelSettings>
     return {
+      music: typeof parsed.music === 'boolean' ? parsed.music : true,
       soundFx: typeof parsed.soundFx === 'boolean' ? parsed.soundFx : true,
       haptics: typeof parsed.haptics === 'boolean' ? parsed.haptics : true,
       celebrations: typeof parsed.celebrations === 'boolean' ? parsed.celebrations : true,
@@ -145,6 +150,9 @@ export function playGameFeel(event: GameFeelEvent, storage?: Pick<Storage, 'getI
   lastEvent = { id: event, at: now }
 
   const settings = readGameFeelSettings(storage)
-  if (settings.soundFx) playToneSequence(event)
+  if (settings.soundFx) {
+    duckStoreAtmosphere(event === 'not_quite' ? 340 : 540)
+    playToneSequence(event)
+  }
   if (settings.haptics) vibrate(event)
 }

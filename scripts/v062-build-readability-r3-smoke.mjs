@@ -10,7 +10,7 @@ const main = fs.readFileSync('src/main.tsx', 'utf8')
 const player = fs.readFileSync('src/components/BuildActivityPlayer.tsx', 'utf8')
 const css = fs.readFileSync('src/styles/v062/buildReadability.css', 'utf8')
 
-assert(['0.6.1', '0.6.2'].includes(pkg.version), `unexpected package version ${pkg.version}`)
+assert(['0.6.1', '0.6.2', '0.6.3'].includes(pkg.version), `unexpected package version ${pkg.version}`)
 assert(lock.version === pkg.version, `package-lock version ${lock.version} must match package version ${pkg.version}`)
 assert(lock.packages?.['']?.version === pkg.version, 'package-lock root package version must match package version')
 assert(main.includes("import './styles/v062/buildReadability.css'"), 'BUILD readability CSS import missing')

@@ -7,9 +7,9 @@ function assert(condition, message) {
 const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'))
 const lock = JSON.parse(fs.readFileSync('package-lock.json', 'utf8'))
 
-assert(pkg.version === '0.6.1', `package version must be 0.6.1, got ${pkg.version}`)
-assert(lock.version === '0.6.1', `package-lock version must be 0.6.1, got ${lock.version}`)
-assert(lock.packages?.['']?.version === '0.6.1', 'package-lock root package version must be 0.6.1')
+assert(['0.6.1', '0.6.2', '0.6.3'].includes(pkg.version), `package version must be 0.6.1/0.6.2/0.6.3, got ${pkg.version}`)
+assert(lock.version === pkg.version, `package-lock version must match package version, got ${lock.version}`)
+assert(lock.packages?.['']?.version === pkg.version, 'package-lock root package version must match package version')
 
 const gameFeel = fs.readFileSync('src/core/gameFeel.ts', 'utf8')
 const passport = fs.readFileSync('src/components/ShiftPassportStrip.tsx', 'utf8')

@@ -1,0 +1,58 @@
+/* v0.6.3 Audio Atmosphere
+   UI only. Audio synthesis lives in core/audioAtmosphere.ts and does not
+   introduce any learning-progress state. */
+
+.v063-audio-preview {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 12px 14px;
+  border: 1px solid rgba(78, 116, 102, .22);
+  border-radius: 14px;
+  background: linear-gradient(145deg, #f3f8f5, #fffdf8);
+  color: #315b5e;
+  text-align: left;
+  cursor: pointer;
+}
+
+.v063-audio-preview:disabled {
+  cursor: default;
+  opacity: .48;
+}
+
+.v063-audio-preview > span {
+  display: grid;
+  gap: 2px;
+}
+
+.v063-audio-preview strong {
+  font-size: 13px;
+}
+
+.v063-audio-preview small {
+  color: #75817c;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.v063-audio-preview em {
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #e2eee8;
+  color: #3f6d5c;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: .06em;
+}
+
+@media (max-width: 430px) {
+  .v063-audio-preview {
+    align-items: flex-start;
+  }
+}

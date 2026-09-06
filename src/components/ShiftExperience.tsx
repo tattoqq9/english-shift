@@ -1,8 +1,10 @@
 import { useEffect } from 'react'
 import { readBuildProgress } from '../core/build'
+import { startStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
 import { playGameFeel, primeGameFeelAudio, readGameFeelSettings } from '../core/gameFeel'
 import { level2BuildActivities } from '../data/level2BuildActivities'
 import { ShiftPassportStrip, type PassportStamp } from './ShiftPassportStrip'
+import { recordRetentionSession } from '../core/retention'
 
 type ShiftDay = {
   day: number
@@ -107,6 +109,7 @@ export function ShiftIntro({ chapterId, day, onStart, onBack }: IntroProps) {
             className="v060-primary-cta v060-shift-start"
             onClick={() => {
               primeGameFeelAudio()
+              startStoreAtmosphere(chapterId, window.localStorage)
               onStart()
             }}
           >
@@ -126,7 +129,13 @@ export function ShiftDayResult({ chapterId, day, scores, hintCounts, onFinish, o
   const gameFeel = readGameFeelSettings(window.localStorage)
   const passport = passportForStore(chapterId, day.day)
 
+  const finishShift = () => {
+    recordRetentionSession('select_shift', window.localStorage)
+    onFinish(percent, hintsUsed)
+  }
+
   useEffect(() => {
+    stopStoreAtmosphere(140)
     playGameFeel('shift_complete', window.localStorage)
   }, [])
 
@@ -158,7 +167,7 @@ export function ShiftDayResult({ chapterId, day, scores, hintCounts, onFinish, o
               type="button"
               className="v060-primary-cta"
               onClick={() => {
-                onFinish(percent, hintsUsed)
+                finishShift()
                 onBuild()
               }}
             >
@@ -167,7 +176,7 @@ export function ShiftDayResult({ chapterId, day, scores, hintCounts, onFinish, o
             <button
               type="button"
               className="v060-secondary-cta"
-              onClick={() => onFinish(percent, hintsUsed)}
+              onClick={finishShift}
             >
               Finish for now
             </button>

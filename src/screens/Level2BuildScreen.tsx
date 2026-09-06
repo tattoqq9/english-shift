@@ -17,7 +17,9 @@ import { chapterMeta } from '../core/navigationProgress'
 import { level2BuildActivities, level2BuildDayMeta } from '../data/level2BuildActivities'
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 import { playGameFeel, readGameFeelSettings } from '../core/gameFeel'
+import { startStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
 import { ShiftPassportStrip, type PassportStamp } from '../components/ShiftPassportStrip'
+import { recordRetentionSession } from '../core/retention'
 
 type Props = {
   onNavigate: (view: AppView) => void
@@ -83,12 +85,18 @@ export function Level2BuildScreen({ onNavigate }: Props) {
     if (launchDay) clearBuildDayLaunch(window.sessionStorage)
   }, [launchDay])
 
+  useEffect(() => {
+    if (initialDay) startStoreAtmosphere(Math.ceil(initialDay / 6), window.localStorage, 'build')
+    return () => stopStoreAtmosphere(120)
+  }, [initialDay])
+
   const activeActivities = useMemo(() => activeDay ? dayActivities(activeDay) : [], [activeDay])
   const activeActivity = activeActivities[activityIndex]
   const completed = useMemo(() => new Set(progress.completedIds), [progress])
 
   const openDay = (day: number) => {
     if (!buildDayUnlocked(day)) return
+    startStoreAtmosphere(Math.ceil(day / 6), window.localStorage, 'build')
     setActiveDay(day)
     setActivityIndex(firstIncompleteIndex(day, progress))
     setSessionScores([])
@@ -97,6 +105,7 @@ export function Level2BuildScreen({ onNavigate }: Props) {
   }
 
   const exitDay = () => {
+    stopStoreAtmosphere(140)
     setActiveDay(null)
     setActivityIndex(0)
     setSessionScores([])
@@ -113,7 +122,11 @@ export function Level2BuildScreen({ onNavigate }: Props) {
     if (activityIndex < activeActivities.length - 1) {
       setActivityIndex((index) => index + 1)
     } else {
+      stopStoreAtmosphere(140)
+      recordRetentionSession('build_day', window.localStorage)
       playGameFeel('build_complete', window.localStorage)
+      const storeMastered = activeDay != null && passportForBuildDay(activeDay, next).every((stamp) => stamp.status === 'paired')
+      if (storeMastered) window.setTimeout(() => playGameFeel('stamp', window.localStorage), 460)
       setDayFinished(true)
     }
     scrollTop()
