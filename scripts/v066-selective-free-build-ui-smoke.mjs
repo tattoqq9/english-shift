@@ -12,7 +12,7 @@ const screen = read('src/screens/Level2BuildScreen.tsx')
 const freeCore = read('src/core/freeBuild.ts')
 const more = read('src/screens/MoreScreen.tsx')
 
-assert(pkg.version === '0.6.6', `package must be 0.6.6, got ${pkg.version}`)
+assert(['0.6.6', '0.7.0'].includes(pkg.version), `package must be 0.6.6/0.7.0, got ${pkg.version}`)
 assert(screen.includes('standardFreeBuildDecision'), 'BUILD screen does not use audited Free suitability')
 assert(screen.includes("basePresentation === 'free'"), 'base Free presentation gate missing')
 assert(screen.includes("mode === 'standard'"), 'Standard-only fallback guard missing')
@@ -20,7 +20,7 @@ assert(screen.includes("'Semi-guided · complex response'"), 'complex response m
 assert(screen.includes('複雑な長文はSemi-guided'), 'learner-facing selective Free copy missing')
 assert(freeCore.includes('export function standardFreeBuildDecision'), 'shared Free suitability helper missing')
 assert(freeCore.includes('eligible: risk < 5'), 'HIGH-risk threshold guard missing')
-assert(more.includes('v0.6.6 · Selective Free BUILD'), 'v0.6.6 version card missing')
+assert(more.includes('v0.6.6 · Selective Free BUILD') || more.includes('v0.7.0 · Public Beta'), 'v0.6.6+ version card missing')
 
 console.log('English Shift v0.6.6 Selective Free BUILD UI smoke: PASS')
 console.log('audited risk gate · explicit session label · Standard fallback only · Challenge preserved')

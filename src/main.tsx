@@ -22,6 +22,7 @@ import './styles/v062/buildReadability.css'
 import './styles/v064/collection.css'
 import './styles/v065/freeBuild.css'
 import './styles/v065/sessionMode.css'
+import './styles/v070/publicBeta.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

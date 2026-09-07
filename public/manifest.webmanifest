@@ -1,0 +1,29 @@
+{
+  "name": "English Shift",
+  "short_name": "English Shift",
+  "description": "接客シーンで英文法を見分け、作り、弱点を直す英語学習ゲーム。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f1e8",
+  "theme_color": "#31463a",
+  "lang": "ja",
+  "categories": [
+    "education",
+    "games"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

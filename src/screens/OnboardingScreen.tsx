@@ -16,9 +16,9 @@ type Step = {
 
 const STEPS: Step[] = [
   {
-    eyebrow: 'WELCOME TO ENGLISH SHIFT',
+    eyebrow: 'WELCOME TO ENGLISH SHIFT · PUBLIC BETA',
     title: 'まず、1 Shiftだけやってみる。',
-    body: '接客シーンの中で英語を選び、使った表現をその日のうちに自分で組み立てます。最初から大量のメニューを覚える必要はありません。',
+    body: '接客シーンの中で英語を選び、使った表現をその日のうちに自分で組み立てます。最初から大量のメニューを覚える必要はありません。進捗はこのブラウザに保存されます。',
     accent: 'ABOUT 4 MIN',
     kind: 'welcome',
   },

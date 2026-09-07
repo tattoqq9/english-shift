@@ -1,0 +1,28 @@
+.v070-public-beta-card {
+  border: 1px solid #d8d1c4;
+  background:
+    linear-gradient(135deg, rgba(49, 70, 58, .055), rgba(217, 183, 104, .07)),
+    #fffdf8;
+}
+.v070-public-beta-card > span > small { color: #586c5f; }
+.v070-release-link { color: inherit; text-decoration: none; }
+.v070-release-link:focus-visible { outline: 3px solid rgba(73, 106, 85, .26); outline-offset: 3px; }
+.v070-beta-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  padding: 0 9px;
+  border: 1px solid #cad8cf;
+  border-radius: 999px;
+  background: #edf4ef;
+  color: #365244;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .1em;
+}
+.v070-beta-note { margin: 10px 0 0; color: #766f65; font-size: 10.5px; line-height: 1.6; }
+@media (max-width: 520px) {
+  .v070-public-beta-card { border-radius: 16px; }
+  .v070-release-link { -webkit-tap-highlight-color: transparent; }
+}

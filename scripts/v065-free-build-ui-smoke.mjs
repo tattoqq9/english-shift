@@ -17,9 +17,9 @@ const more = read('src/screens/MoreScreen.tsx')
 const main = read('src/main.tsx')
 const css = read('src/styles/v065/freeBuild.css')
 
-assert(['0.6.5', '0.6.6'].includes(pkg.version), `package version must be 0.6.5/0.6.6, got ${pkg.version}`)
-assert(['0.6.5', '0.6.6'].includes(lock.version), `package-lock version must be 0.6.5/0.6.6, got ${lock.version}`)
-assert(['0.6.5', '0.6.6'].includes(lock.packages?.['']?.version), 'package-lock root version must be 0.6.5/0.6.6')
+assert(['0.6.5', '0.6.6', '0.7.0'].includes(pkg.version), `package version must be 0.6.5/0.6.6/0.7.0, got ${pkg.version}`)
+assert(['0.6.5', '0.6.6', '0.7.0'].includes(lock.version), `package-lock version must be 0.6.5/0.6.6/0.7.0, got ${lock.version}`)
+assert(['0.6.5', '0.6.6', '0.7.0'].includes(lock.packages?.['']?.version), 'package-lock root version must be 0.6.5/0.6.6/0.7.0')
 
 assert(buildCore.includes("if (mode === 'challenge') return 'free'"), 'Challenge must remain free presentation')
 assert(buildCore.includes('if (day <= 30)'), 'Standard progression boundary missing')
@@ -35,7 +35,8 @@ assert(buildScreen.includes('Day 31以降はFree typing中心'), 'Standard selec
 assert(buildScreen.includes('全Dayを自由入力'), 'Challenge free BUILD copy missing')
 assert(
   more.includes('v0.6.5 · Free BUILD Production')
-    || more.includes('v0.6.6 · Selective Free BUILD'),
+    || more.includes('v0.6.6 · Selective Free BUILD')
+    || more.includes('v0.7.0 · Public Beta'),
   'v0.6.5+ Free BUILD version card missing',
 )
 assert(main.includes("./styles/v065/freeBuild.css"), 'v0.6.5 free BUILD stylesheet import missing')

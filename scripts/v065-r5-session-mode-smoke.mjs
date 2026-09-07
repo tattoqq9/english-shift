@@ -13,7 +13,7 @@ const player = read('src/components/BuildActivityPlayer.tsx')
 const main = read('src/main.tsx')
 const css = read('src/styles/v065/sessionMode.css')
 
-assert(['0.6.5', '0.6.6'].includes(pkg.version), `package must be 0.6.5/0.6.6, got ${pkg.version}`)
+assert(['0.6.5', '0.6.6', '0.7.0'].includes(pkg.version), `package must be 0.6.5/0.6.6/0.7.0, got ${pkg.version}`)
 assert(screen.includes('v065-session-mode-panel'), 'in-session Practice Mode panel missing')
 assert(screen.includes('PRACTICE MODE'), 'in-session Practice Mode label missing')
 assert(screen.includes('Standard'), 'Standard button/copy missing')

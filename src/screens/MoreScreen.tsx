@@ -114,6 +114,48 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
 
       <section className="v060-more-section">
         <div className="v060-more-section-head">
+          <small>PUBLIC BETA</small>
+          <strong>About, feedback & saved data</strong>
+        </div>
+        <div className="v060-more-list">
+          <article className="v060-more-row info v070-public-beta-card">
+            <span>
+              <small>PUBLIC BETA</small>
+              <strong>English Shift v0.7.0</strong>
+              <p>接客シーンで「見分ける → 作る → 弱点を直す」を繰り返す英語学習ゲームです。進捗は現在このブラウザに保存されます。</p>
+              <span className="v070-beta-badge">NO ACCOUNT REQUIRED</span>
+              <p className="v070-beta-note">ブラウザのサイトデータを削除すると進捗が消える場合があります。</p>
+            </span>
+            <em>BETA</em>
+          </article>
+
+          <a
+            className="v060-more-row v070-release-link"
+            href="https://github.com/tattoqq9/english-shift/issues/new?title=%5BPublic%20Beta%5D%20Feedback"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <span>
+              <small>FEEDBACK</small>
+              <strong>Report a problem or suggestion</strong>
+              <p>問題文、採点、表示崩れ、操作しづらい箇所などをGitHub Issuesから送れます。</p>
+            </span>
+            <em>Open ↗</em>
+          </a>
+
+          <a className="v060-more-row v070-release-link" href="/privacy.html">
+            <span>
+              <small>PRIVACY</small>
+              <strong>Privacy & Saved Data</strong>
+              <p>ブラウザに保存される進捗、Public Betaでのデータ取り扱いについて確認できます。</p>
+            </span>
+            <em>Read →</em>
+          </a>
+        </div>
+      </section>
+
+      <section className="v060-more-section">
+        <div className="v060-more-section-head">
           <small>ABOUT</small>
           <strong>Curriculum & version</strong>
         </div>
@@ -130,10 +172,10 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.6 · Selective Free BUILD</strong>
-              <p>Standard後半は監査済み28問をFree typing、複雑な26問をSemi-guidedへ。Challengeでは全144問のFree typingを維持します。</p>
+              <strong>v0.7.0 · Public Beta</strong>
+              <p>Public Beta release。v0.6.6の学習構造を固定し、公開用metadata、Privacy、Feedback、PWA assets、release gateを追加。</p>
             </span>
-            <em>RC prep</em>
+            <em>PUBLIC</em>
           </article>
 
           {DEBUG_UNLOCK_ALL_DAYS && (

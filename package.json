@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.6.6",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -65,7 +65,10 @@
     "v066:selective:core": "tsc -p tsconfig.core.json && node .core-build/scripts/v066-selective-free-build-smoke.js",
     "v066:selective:ui": "node scripts/v066-selective-free-build-ui-smoke.mjs",
     "v066:check": "npm run v065:check && npm run v065:freebuild:quality && npm run v066:selective:core && npm run v066:selective:ui",
-    "v066:release": "npm run version:sync && npm run v066:check && npm run rc:check"
+    "v066:release": "npm run version:sync && npm run v066:check && npm run rc:check",
+    "v070:web:smoke": "node scripts/v070-public-beta-smoke.mjs",
+    "v070:check": "npm run v066:check && npm run v070:web:smoke",
+    "v070:release": "npm run version:sync && npm run v070:check && npm run rc:check"
   },
   "dependencies": {
     "react": "^19.2.7",
