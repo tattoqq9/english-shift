@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://english-shift.tattoqq9.workers.dev/sitemap.xml

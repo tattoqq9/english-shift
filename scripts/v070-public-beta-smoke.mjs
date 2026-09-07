@@ -24,7 +24,7 @@ assert(manifest.icons?.some((icon) => icon.sizes === '512x512'), '512px icon mis
 
 for (const file of [
   'public/icon-192.png','public/icon-512.png','public/apple-touch-icon.png',
-  'public/og-card.png','public/privacy.html','public/robots.txt',
+  'public/og-card.png','public/privacy.html','public/robots.txt','public/sitemap.xml',
 ]) assert(fs.existsSync(file), `public release asset missing: ${file}`)
 
 for (const token of [
@@ -45,6 +45,10 @@ assert(privacy.includes('2026-09-07'), 'privacy update date missing')
 assert(releaseDoc.includes('npm run build'), 'Cloudflare build command missing')
 assert(releaseDoc.includes('dist'), 'Cloudflare output directory missing')
 assert(releaseDoc.includes('VITE_DEBUG_UNLOCK_ALL_DAYS'), 'production debug warning missing')
+assert(index.includes('<link rel="canonical" href="https://english-shift.tattoqq9.workers.dev/" />'), 'canonical public URL missing')
+assert(index.includes('<meta property="og:url" content="https://english-shift.tattoqq9.workers.dev/" />'), 'absolute og:url missing')
+assert(index.includes('<meta property="og:image" content="https://english-shift.tattoqq9.workers.dev/og-card.png" />'), 'absolute og:image missing')
+assert(read('public/robots.txt').includes('Sitemap: https://english-shift.tattoqq9.workers.dev/sitemap.xml'), 'sitemap directive missing')
 assert(runtime.includes("VITE_DEBUG_UNLOCK_ALL_DAYS === 'true'"), 'debug mode must remain opt-in only')
 
 console.log('English Shift v0.7.0 Public Beta web smoke: PASS')

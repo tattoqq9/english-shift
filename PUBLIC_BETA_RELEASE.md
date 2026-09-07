@@ -60,4 +60,10 @@ That variable is only for local/debug validation.
 - `/apple-touch-icon.png`
 - `/og-card.png`
 
-After the final public URL is known, add canonical URL / absolute `og:url` / absolute `og:image` / sitemap URL in a metadata-only follow-up. Do not hard-code a provisional domain.
+## Final Public Beta URL
+
+https://english-shift.tattoqq9.workers.dev/
+
+Canonical metadata, absolute Open Graph image URLs, and sitemap are pinned to this URL.
+
+If a custom domain is introduced later, replace these canonical URLs in one metadata-only migration.
