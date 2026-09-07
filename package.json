@@ -1,7 +1,7 @@
 {
   "name": "english-shift-v01",
   "private": true,
-  "version": "0.6.5",
+  "version": "0.6.6",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -60,7 +60,12 @@
     "v065:freebuild:ui": "node scripts/v065-free-build-ui-smoke.mjs",
     "v065:check": "npm run v065:freebuild:core && npm run v065:freebuild:ui && npm run v065:r5:smoke && npm run v064:check",
     "v065:release": "npm run version:sync && npm run v065:check && npm run rc:check",
-    "v065:r5:smoke": "node scripts/v065-r5-session-mode-smoke.mjs"
+    "v065:r5:smoke": "node scripts/v065-r5-session-mode-smoke.mjs",
+    "v065:freebuild:quality": "tsc -p tsconfig.core.json && node .core-build/scripts/v065-free-build-quality-audit.js",
+    "v066:selective:core": "tsc -p tsconfig.core.json && node .core-build/scripts/v066-selective-free-build-smoke.js",
+    "v066:selective:ui": "node scripts/v066-selective-free-build-ui-smoke.mjs",
+    "v066:check": "npm run v065:check && npm run v065:freebuild:quality && npm run v066:selective:core && npm run v066:selective:ui",
+    "v066:release": "npm run version:sync && npm run v066:check && npm run rc:check"
   },
   "dependencies": {
     "react": "^19.2.7",

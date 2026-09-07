@@ -130,8 +130,8 @@ export function MoreScreen({ onNavigate }: { onNavigate: (view: AppView) => void
           <article className="v060-more-row info">
             <span>
               <small>VERSION</small>
-              <strong>v0.6.5 · Free BUILD Production</strong>
-              <p>Standard後半とChallengeを本当の自由入力BUILDへ移行。端末内の保守的判定でCorrect / Almost / Not quiteを返します。</p>
+              <strong>v0.6.6 · Selective Free BUILD</strong>
+              <p>Standard後半は監査済み28問をFree typing、複雑な26問をSemi-guidedへ。Challengeでは全144問のFree typingを維持します。</p>
             </span>
             <em>RC prep</em>
           </article>

@@ -70,6 +70,16 @@ const negation = diagnoseFreeBuild(
 assert(negation.check === 'not_quite', 'negation reversal must be Not quite')
 assert(negation.feedback.includes('肯定・否定'), 'negation-specific feedback missing')
 
+const repeatedModalActivity = {
+  ...sample,
+  targetSentence: 'We can check the receipt, and then we can confirm the return policy.',
+}
+const repeatedModalChanged = diagnoseFreeBuild(
+  repeatedModalActivity,
+  'We should check the receipt, and then we can confirm the return policy.',
+)
+assert(repeatedModalChanged.check === 'not_quite', 'changing one of repeated modals must be Not quite')
+
 const modalActivity = {
   ...sample,
   targetSentence: 'Could you wait here for a moment?',

@@ -18,9 +18,9 @@ const card = read('src/components/CollectionProgressCard.tsx')
 const css = read('src/styles/v064/collection.css')
 const audio = read('src/core/audioAtmosphere.ts')
 
-assert(['0.6.4', '0.6.5'].includes(pkg.version), `package version must be 0.6.4/0.6.5, got ${pkg.version}`)
-assert(['0.6.4', '0.6.5'].includes(lock.version), `package-lock version must be 0.6.4/0.6.5, got ${lock.version}`)
-assert(['0.6.4', '0.6.5'].includes(lock.packages?.['']?.version), 'package-lock root version must be 0.6.4/0.6.5')
+assert(['0.6.4', '0.6.5', '0.6.6'].includes(pkg.version), `package version must be 0.6.4/0.6.5/0.6.6, got ${pkg.version}`)
+assert(['0.6.4', '0.6.5', '0.6.6'].includes(lock.version), `package-lock version must be 0.6.4/0.6.5/0.6.6, got ${lock.version}`)
+assert(['0.6.4', '0.6.5', '0.6.6'].includes(lock.packages?.['']?.version), 'package-lock root version must be 0.6.4/0.6.5/0.6.6')
 
 assert(collection.includes("english-shift-collection-v1"), 'isolated collection UI state key missing')
 assert(collection.includes('readActualCompletedSelectDays'), 'collection must derive actual SELECT completion')
@@ -34,7 +34,8 @@ assert(today.includes("onOpen={() => onNavigate('more')}"), 'Today collection ro
 assert(more.includes('<CustomerBook />'), 'Customer Book missing from More')
 assert(
   more.includes('v0.6.4 · Customer Collection')
-    || more.includes('v0.6.5 · Free BUILD Production'),
+    || more.includes('v0.6.5 · Free BUILD Production')
+    || more.includes('v0.6.6 · Selective Free BUILD'),
   'v0.6.4+ collection/version card missing in More',
 )
 assert(book.includes('Customer Book'), 'Customer Book title missing')

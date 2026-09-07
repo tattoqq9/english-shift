@@ -18,6 +18,7 @@ import { level2BuildActivities, level2BuildDayMeta } from '../data/level2BuildAc
 import { DEBUG_UNLOCK_ALL_DAYS } from '../runtimeMode'
 import { playGameFeel, readGameFeelSettings } from '../core/gameFeel'
 import { startStoreAtmosphere, stopStoreAtmosphere } from '../core/audioAtmosphere'
+import { standardFreeBuildDecision } from '../core/freeBuild'
 import { ShiftPassportStrip, type PassportStamp } from '../components/ShiftPassportStrip'
 import { recordRetentionSession } from '../core/retention'
 
@@ -179,6 +180,13 @@ export function Level2BuildScreen({ onNavigate }: Props) {
   }
 
   if (activeDay && activeActivity) {
+    const basePresentation = buildPresentation(mode, (activeDay - 1) * 3 + activityIndex, activeDay)
+    const freeDecision = standardFreeBuildDecision(activeActivity)
+    const activePresentation =
+      mode === 'standard' && basePresentation === 'free' && !freeDecision.eligible
+        ? 'semi'
+        : basePresentation
+
     return (
       <main className="v060-build-day-session">
         <header className="v060-build-day-header">
@@ -198,10 +206,10 @@ export function Level2BuildScreen({ onNavigate }: Props) {
             <strong>{modeCopy[mode]} · {
               mode === 'guided'
                 ? 'Structure Slots'
-                : mode === 'challenge'
+                : activePresentation === 'free'
                   ? 'Free typing'
-                  : activeDay >= 31
-                    ? 'Free typing'
+                  : mode === 'standard' && basePresentation === 'free'
+                    ? 'Semi-guided · complex response'
                     : activeDay >= 13
                       ? 'Semi-guided chunks'
                       : 'Structure Slots'
@@ -224,11 +232,13 @@ export function Level2BuildScreen({ onNavigate }: Props) {
               ? 'Guidedは全Dayでchunk + Structure Slotです。'
               : mode === 'challenge'
                 ? 'Challengeは全Dayでキーボード自由入力です。'
-                : activeDay >= 31
-                  ? <><strong>Standard Day 31–48</strong> はキーボード自由入力です。</>
-                  : activeDay >= 13
-                    ? 'Standard Day 13–30はSemi-guided chunkです。'
-                    : 'Standard Day 1–12はStructure Slotです。'}
+                : basePresentation === 'free' && !freeDecision.eligible
+                  ? <><strong>Standard</strong>では、複雑な長文はSemi-guidedで意味と構造に集中します。ChallengeならFree typingで挑戦できます。</>
+                  : activePresentation === 'free'
+                    ? <><strong>Standard</strong>のFree typingです。キーボードだけで返答を作ります。</>
+                    : activeDay >= 13
+                      ? 'Standard Day 13–30はSemi-guided chunkです。'
+                      : 'Standard Day 1–12はStructure Slotです。'}
           </p>
         </section>
 
@@ -236,7 +246,7 @@ export function Level2BuildScreen({ onNavigate }: Props) {
           key={activeActivity.id + '-' + mode}
           activity={activeActivity}
           mode={mode}
-          presentation={buildPresentation(mode, (activeDay - 1) * 3 + activityIndex, activeDay)}
+          presentation={activePresentation}
           onExit={exitDay}
           onComplete={(score) => completeActivity(activeActivity, score)}
         />
@@ -270,7 +280,7 @@ export function Level2BuildScreen({ onNavigate }: Props) {
           ))}
         </div>
         <p className="v065-build-mode-note">
-          <strong>Standard</strong>: Day 31以降は自由入力 · <strong>Challenge</strong>: 全Dayを自由入力 · <strong>Guided</strong>: Structure Slotを維持
+          <strong>Standard</strong>: Day 31以降はFree typing中心。複雑な長文はSemi-guided · <strong>Challenge</strong>: 全Dayを自由入力 · <strong>Guided</strong>: Structure Slot
         </p>
       </details>
 

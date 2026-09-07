@@ -99,6 +99,66 @@ export function freeBuildSignature(text: string) {
   return normalizeFreeBuildText(text)
 }
 
+export type StandardFreeBuildDecision = {
+  eligible: boolean
+  risk: number
+  words: number
+  sentences: number
+  clauses: number
+  flags: string[]
+}
+
+function freeBuildSentenceCount(text: string) {
+  const pieces = text.split(/[.!?]+(?=\s|$)/).map((item) => item.trim()).filter(Boolean)
+  return Math.max(1, pieces.length)
+}
+
+function freeBuildClauseCount(text: string) {
+  const matches = text.toLowerCase().match(/\b(and|but|so|because|if|when|while|although|though|whether|that|which|who|where|before|after|until|unless|therefore|however)\b/g)
+  return matches?.length ?? 0
+}
+
+function freeBuildHasNumberOrCode(text: string) {
+  return /\b\d[\d:-]*\b/.test(text) || /\b[A-Z]-?\d{2,}\b/.test(text)
+}
+
+function freeBuildOptionalOpening(text: string) {
+  return /^(yes|no|okay|sure|of course|i'm sorry|i am sorry|let me|certainly)[,.\s]/i.test(
+    text.replace(/[’‘‛`´]/g, "'"),
+  )
+}
+
+/**
+ * Standard mode uses Free typing only when the audited target is suitable for
+ * exact, deterministic production on mobile. HIGH-risk responses fall back to
+ * Semi-guided chunks. Challenge mode intentionally ignores this gate.
+ */
+export function standardFreeBuildDecision(activity: BuildActivity): StandardFreeBuildDecision {
+  const words = freeBuildTokens(activity.targetSentence).length
+  const sentences = freeBuildSentenceCount(activity.targetSentence)
+  const clauses = freeBuildClauseCount(activity.targetSentence)
+  const flags: string[] = []
+  let risk = 0
+
+  if (words >= 24) { risk += 4; flags.push('very-long>=24w') }
+  else if (words >= 18) { risk += 2; flags.push('long>=18w') }
+
+  if (sentences >= 3) { risk += 5; flags.push('3+-sentences') }
+  else if (sentences === 2) { risk += 3; flags.push('multi-sentence') }
+
+  if (clauses >= 3) { risk += 2; flags.push('3+-clause-markers') }
+  else if (clauses === 2) { risk += 1; flags.push('2-clause-markers') }
+
+  if (freeBuildHasNumberOrCode(activity.targetSentence)) { risk += 2; flags.push('number/code') }
+  if (/[;:]/.test(activity.targetSentence)) { risk += 1; flags.push('semicolon/colon') }
+  if (freeBuildOptionalOpening(activity.targetSentence)) { risk += 1; flags.push('optional-opening') }
+
+  const hasTargetGrammar = activity.grammarTargets.some((ref) => ref.role === 'target')
+  if (!hasTargetGrammar) { risk += 1; flags.push('no-explicit-target-grammar') }
+
+  return { eligible: risk < 5, risk, words, sentences, clauses, flags }
+}
+
 function levenshtein<T>(left: T[], right: T[]) {
   const previous = Array.from({ length: right.length + 1 }, (_, index) => index)
   const current = Array<number>(right.length + 1).fill(0)
@@ -167,15 +227,18 @@ function coverageAgainst(targetTokens: string[], answerTokens: string[]) {
   return matched / basis.length
 }
 
-function modalSet(tokens: string[]) {
-  return new Set(tokens.filter((token) => MODALS.has(token)))
+function modalSequence(tokens: string[]) {
+  return tokens.filter((token) => MODALS.has(token))
 }
 
 function modalMismatch(target: string[], answer: string[]) {
-  const targetModals = modalSet(target)
-  const answerModals = modalSet(answer)
-  if (!targetModals.size || !answerModals.size) return false
-  return ![...targetModals].some((modal) => answerModals.has(modal))
+  const targetModals = modalSequence(target)
+  const answerModals = modalSequence(answer)
+
+  if (!targetModals.length && !answerModals.length) return false
+  if (targetModals.length !== answerModals.length) return true
+
+  return targetModals.some((modal, index) => modal !== answerModals[index])
 }
 
 function negationMismatch(target: string[], answer: string[]) {
